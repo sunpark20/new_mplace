@@ -10,6 +10,9 @@ import '../data/day4.dart';
 import '../data/day5_fc.dart';
 import '../data/day6_pao.dart';
 import 'day_screen.dart';
+import 'num_sample_screen.dart';
+import 'num_prac_screen.dart';
+import 'video_screen.dart';
 
 /// 메인 화면 - 앱의 허브, 다양한 학습 단계로 이동
 class MainScreen extends StatefulWidget {
@@ -192,7 +195,7 @@ class _MainScreenState extends State<MainScreen> {
                       icon: Icons.people,
                       color: Colors.blue,
                       onPressed: () {
-                        _showComingSoon(context, '숫자-인물 가이드');
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const NumSampleScreen()));
                       },
                     ),
                     _buildMenuButton(
@@ -222,7 +225,7 @@ class _MainScreenState extends State<MainScreen> {
                       icon: Icons.quiz,
                       color: Colors.green,
                       onPressed: () {
-                        _showComingSoon(context, '숫자 암기 연습');
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const NumPracScreen()));
                       },
                     ),
                     const SizedBox(height: 24),
@@ -241,7 +244,7 @@ class _MainScreenState extends State<MainScreen> {
                       icon: Icons.video_library,
                       color: Colors.red,
                       onPressed: () {
-                        _showComingSoon(context, 'TED 비디오');
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const VideoScreen()));
                       },
                     ),
                   ],
@@ -285,12 +288,4 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature 준비 중...'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 }

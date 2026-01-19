@@ -1,3 +1,4 @@
+import 'video_screen.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -244,7 +245,7 @@ class _DayScreenState extends State<DayScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 24.0),
                         child: ElevatedButton.icon(
-                          onPressed: () {
+                          onPressed: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const VideoScreen()));
                           },
                           icon: const Icon(Icons.play_circle_outline),
                           label: const Text('TED 비디오 재생'),
