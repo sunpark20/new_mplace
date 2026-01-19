@@ -9,8 +9,10 @@ class VideoScreen extends StatefulWidget {
 }
 
 class _VideoScreenState extends State<VideoScreen> {
-  late VideoPlayerController _controller;
+  VideoPlayerController? _controller;
   bool _isInitialized = false;
+  bool _hasError = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -19,22 +21,30 @@ class _VideoScreenState extends State<VideoScreen> {
   }
 
   Future<void> _initializeVideo() async {
-    _controller = VideoPlayerController.asset('assets/videos/ted_video.mp4');
-
     try {
-      await _controller.initialize();
-      setState(() {
-        _isInitialized = true;
-      });
-      _controller.play();
+      _controller = VideoPlayerController.asset('assets/videos/ted_video.mp4');
+      await _controller!.initialize();
+
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+        });
+        await _controller!.play();
+      }
     } catch (e) {
       debugPrint('Error initializing video: $e');
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = '비디오를 로드할 수 없습니다';
+        });
+      }
     }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
@@ -48,26 +58,55 @@ class _VideoScreenState extends State<VideoScreen> {
       ),
       backgroundColor: Colors.black,
       body: Center(
-        child: _isInitialized
-            ? AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: [
-                    VideoPlayer(_controller),
-                    VideoProgressIndicator(
-                      _controller,
-                      allowScrubbing: true,
-                      colors: const VideoProgressColors(
-                        playedColor: Colors.red,
-                        bufferedColor: Colors.grey,
-                      ),
-                    ),
-                    _ControlsOverlay(controller: _controller),
-                  ],
-                ),
+        child: _hasError
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.white,
+                    size: 64,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    _errorMessage,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _hasError = false;
+                        _isInitialized = false;
+                      });
+                      _initializeVideo();
+                    },
+                    child: const Text('다시 시도'),
+                  ),
+                ],
               )
-            : const CircularProgressIndicator(),
+            : _isInitialized && _controller != null
+                ? AspectRatio(
+                    aspectRatio: _controller!.value.aspectRatio,
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        VideoPlayer(_controller!),
+                        VideoProgressIndicator(
+                          _controller!,
+                          allowScrubbing: true,
+                          colors: const VideoProgressColors(
+                            playedColor: Colors.red,
+                            bufferedColor: Colors.grey,
+                          ),
+                        ),
+                        _ControlsOverlay(controller: _controller!),
+                      ],
+                    ),
+                  )
+                : const CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
       ),
     );
   }
@@ -86,20 +125,32 @@ class _ControlsOverlayState extends State<_ControlsOverlay> {
   @override
   void initState() {
     super.initState();
-    widget.controller.addListener(() {
+    widget.controller.addListener(_videoListener);
+  }
+
+  void _videoListener() {
+    if (mounted) {
       setState(() {});
-    });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_videoListener);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          widget.controller.value.isPlaying
-              ? widget.controller.pause()
-              : widget.controller.play();
-        });
+        if (mounted) {
+          setState(() {
+            widget.controller.value.isPlaying
+                ? widget.controller.pause()
+                : widget.controller.play();
+          });
+        }
       },
       child: Container(
         color: Colors.transparent,
@@ -109,7 +160,7 @@ class _ControlsOverlayState extends State<_ControlsOverlay> {
                 ? Icons.pause_circle_outline
                 : Icons.play_circle_outline,
             size: 64,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
           ),
         ),
       ),

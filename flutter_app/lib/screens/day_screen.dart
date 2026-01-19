@@ -23,8 +23,10 @@ class DayScreen extends StatefulWidget {
 class _DayScreenState extends State<DayScreen> {
   int _currentPage = 0;
   Timer? _countdownTimer;
+  Timer? _animationTimer;
   int _remainingSeconds = 0;
   bool _timerCompleted = false;
+  int _currentAnimationFrame = 0;
   final AudioPlayer _audioPlayer = AudioPlayer();
   BannerAd? _bannerAd;
   bool _isBannerLoaded = false;
@@ -43,11 +45,14 @@ class _DayScreenState extends State<DayScreen> {
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (_) {
-          setState(() {
-            _isBannerLoaded = true;
-          });
+          if (mounted) {
+            setState(() {
+              _isBannerLoaded = true;
+            });
+          }
         },
         onAdFailedToLoad: (ad, error) {
+          debugPrint('Banner ad failed to load: $error');
           ad.dispose();
         },
       ),
@@ -57,6 +62,9 @@ class _DayScreenState extends State<DayScreen> {
 
   void _loadCurrentPage() {
     _timerCompleted = false;
+    _currentAnimationFrame = 0;
+    _animationTimer?.cancel();
+
     final ti = widget.tiArray[_currentPage];
 
     if (ti.hasSound) {
@@ -66,11 +74,17 @@ class _DayScreenState extends State<DayScreen> {
     if (ti.hasTimer) {
       _startTimer(ti.alarmTimeInSeconds!);
     }
+
+    if (ti.hasAnimation && ti.animationFrames!.length > 1) {
+      _startAnimation(ti.animationFrames!.length);
+    }
   }
 
   void _playSound(String path) async {
     try {
-      await _audioPlayer.play(AssetSource(path.replaceFirst('assets/', '')));
+      final cleanPath = path.replaceFirst('assets/', '');
+      await _audioPlayer.stop();
+      await _audioPlayer.play(AssetSource(cleanPath));
     } catch (e) {
       debugPrint('Error playing sound: $e');
     }
@@ -83,20 +97,34 @@ class _DayScreenState extends State<DayScreen> {
 
     _countdownTimer?.cancel();
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_remainingSeconds > 0) {
-          _remainingSeconds--;
-        } else {
-          _timerCompleted = true;
-          timer.cancel();
-        }
-      });
+      if (mounted) {
+        setState(() {
+          if (_remainingSeconds > 0) {
+            _remainingSeconds--;
+          } else {
+            _timerCompleted = true;
+            timer.cancel();
+          }
+        });
+      }
+    });
+  }
+
+  void _startAnimation(int frameCount) {
+    _animationTimer?.cancel();
+    _animationTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (mounted) {
+        setState(() {
+          _currentAnimationFrame = (_currentAnimationFrame + 1) % frameCount;
+        });
+      }
     });
   }
 
   void _nextPage() {
     if (_currentPage < widget.tiArray.length - 1) {
       _countdownTimer?.cancel();
+      _animationTimer?.cancel();
       _audioPlayer.stop();
       setState(() {
         _currentPage++;
@@ -108,6 +136,7 @@ class _DayScreenState extends State<DayScreen> {
   void _previousPage() {
     if (_currentPage > 0) {
       _countdownTimer?.cancel();
+      _animationTimer?.cancel();
       _audioPlayer.stop();
       setState(() {
         _currentPage--;
@@ -125,6 +154,7 @@ class _DayScreenState extends State<DayScreen> {
   @override
   void dispose() {
     _countdownTimer?.cancel();
+    _animationTimer?.cancel();
     _audioPlayer.dispose();
     _bannerAd?.dispose();
     super.dispose();
@@ -150,7 +180,7 @@ class _DayScreenState extends State<DayScreen> {
               onTap: () {
                 if (ti.isTouchPage || ti.hasTouchSound) {
                   if (ti.hasTouchSound) {
-                    _playSound('assets/sounds/touch.mp3');
+                    _playSound('assets/sounds/highfive.mp3');
                   }
                   _nextPage();
                 }
@@ -165,7 +195,9 @@ class _DayScreenState extends State<DayScreen> {
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Image.asset(
                           ti.imageAssetPath!,
+                          fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) {
+                            debugPrint('Error loading image ${ti.imageAssetPath}: $error');
                             return Container(
                               height: 200,
                               color: Colors.grey[300],
@@ -182,7 +214,9 @@ class _DayScreenState extends State<DayScreen> {
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Image.asset(
                           ti.resultImageAssetPath!,
+                          fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) {
+                            debugPrint('Error loading result image ${ti.resultImageAssetPath}: $error');
                             return Container(
                               height: 200,
                               color: Colors.grey[300],
@@ -198,8 +232,10 @@ class _DayScreenState extends State<DayScreen> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Image.asset(
-                          ti.animationFrames!.first,
+                          ti.animationFrames![_currentAnimationFrame],
+                          fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) {
+                            debugPrint('Error loading animation frame: $error');
                             return Container(
                               height: 200,
                               color: Colors.grey[300],
@@ -213,6 +249,9 @@ class _DayScreenState extends State<DayScreen> {
                     if (ti.isHtml)
                       Html(
                         data: ti.text,
+                        onLinkTap: (url, attributes, element) {
+                          debugPrint('Link tapped: $url');
+                        },
                       )
                     else
                       Text(
@@ -245,7 +284,22 @@ class _DayScreenState extends State<DayScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 24.0),
                         child: ElevatedButton.icon(
-                          onPressed: () { Navigator.push(context, MaterialPageRoute(builder: (context) => const VideoScreen()));
+                          onPressed: () {
+                            try {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const VideoScreen(),
+                                ),
+                              );
+                            } catch (e) {
+                              debugPrint('Error navigating to video: $e');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('비디오를 재생할 수 없습니다'),
+                                ),
+                              );
+                            }
                           },
                           icon: const Icon(Icons.play_circle_outline),
                           label: const Text('TED 비디오 재생'),
@@ -265,7 +319,7 @@ class _DayScreenState extends State<DayScreen> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 4,
                   offset: const Offset(0, -2),
                 ),
