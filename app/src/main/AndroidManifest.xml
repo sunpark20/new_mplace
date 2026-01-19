@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_luncher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity android:name=".LoadingActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".NoticeActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" android:exported="true"/>
+
+        <activity android:name=".MainActivity" android:exported="false" android:label="@string/app_name"/>
+        <activity android:name=".day.Day_Activity" android:exported="false" android:parentActivityName=".MainActivity"/>
+
+        <activity android:name=".numSample.NumSample_Activity" android:exported="false" android:label="@string/day_fc_sample" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".numSample.NumSample_Dialog" android:exported="false" android:theme="@style/Theme.AppCompat.Light.Dialog"/>
+
+        <activity android:name=".numPrac.NumPrac_Activity" android:exported="false" android:label="@string/numPrac" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".numPrac.NumPrac_mem_Activity" android:exported="false" android:label="@string/numPrac_mem" android:parentActivityName=".numPrac.NumPrac_Activity"/>
+        <activity android:name=".numPrac.NumPrac_mem_date_Activity" android:exported="false" android:label="@string/numPrac_mem_date" android:parentActivityName=".numPrac.NumPrac_mem_Activity"/>
+        <activity android:name=".numPrac.NumPrac_mem_score_Activity" android:exported="false" android:label="@string/numPrac_mem_score" android:parentActivityName=".numPrac.NumPrac_mem_Activity"/>
+
+        <activity android:name=".VideoPlayerActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
+
+    </application>
+
+</manifest>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView111"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/addmop_code" />
+
+    <Button
+        android:id="@+id/day0"
+        style="@style/mainButton"
+        android:layout_below="@+id/adView111"
+        android:gravity="center"
+        android:onClick="day0ButtonOnClicked"
+        android:text="@string/intro" />
+
+    <Button
+        android:id="@+id/day1"
+        style="@style/mainButton"
+        android:layout_below="@+id/day0"
+        android:onClick="day1ButtonOnClicked"
+        android:text="@string/day1" />
+
+    <Button
+        android:id="@+id/day2"
+        style="@style/mainButton"
+        android:layout_below="@+id/day1"
+        android:onClick="day2ButtonOnClicked"
+        android:text="@string/day2" />
+
+    <LinearLayout
+        android:id="@+id/day3_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/day2"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/day3"
+            style="@style/horizonTwo"
+            android:onClick="day3ButtonOnClicked"
+            android:text="@string/day3" />
+
+        <Button
+            android:id="@+id/day3_2"
+            style="@style/horizonTwo"
+            android:onClick="day3_2ButtonOnClicked"
+            android:text="@string/day3_2" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/day4"
+        style="@style/mainButton"
+        android:layout_below="@+id/day3_container"
+        android:onClick="day4ButtonOnClicked"
+        android:text="@string/day4" />
+
+    <LinearLayout
+        android:id="@+id/peopleToNum_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/day4"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/firstChallenge"
+            style="@style/horizonTwo"
+            android:onClick="firstChallengeButtonOnClicked"
+            android:text="@string/day_fc" />
+
+        <Button
+            android:id="@+id/peopleToNum_sample"
+            style="@style/horizonTwo"
+            android:onClick="peopleToNumsampleButtonOnClicked"
+            android:text="@string/day_fc_sample" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/pao_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/peopleToNum_container"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/day_pao"
+            style="@style/horizonTwo"
+            android:onClick="day_paoButtonOnClicked"
+            android:text="@string/day_pao" />
+
+        <Button
+            android:id="@+id/day6_pac"
+            style="@style/horizonTwo"
+            android:onClick="day6_pacButtonOnClicked"
+            android:text="@string/numPrac" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/ted_video_button"
+        style="@style/mainButton"
+        android:layout_below="@+id/pao_container"
+        android:onClick="tedVideoButtonOnClicked"
+        android:text="TED 강연 보기" />
+
+</RelativeLayout>
