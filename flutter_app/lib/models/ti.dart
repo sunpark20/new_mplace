@@ -1,5 +1,3 @@
-/// TI (Text-Image) - 학습 슬라이드 데이터 모델
-/// 기억의 궁전 앱의 핵심 데이터 구조
 class TI {
   final String text;
   final String? imageAssetPath;
@@ -10,6 +8,7 @@ class TI {
   final bool isYoutubeLink;
   final bool isTouchPage;
   final String? resultImageAssetPath;
+  final bool hasTouchSound;
 
   TI({
     required this.text,
@@ -21,21 +20,132 @@ class TI {
     this.isYoutubeLink = false,
     this.isTouchPage = false,
     this.resultImageAssetPath,
+    this.hasTouchSound = false,
   });
 
-  /// 타이머가 있는지 확인
+  TI withAnimation(List<String> frames) {
+    return TI(
+      text: text,
+      imageAssetPath: imageAssetPath,
+      animationFrames: frames,
+      soundAssetPath: soundAssetPath,
+      alarmTimeInSeconds: alarmTimeInSeconds,
+      isHtml: isHtml,
+      isYoutubeLink: isYoutubeLink,
+      isTouchPage: isTouchPage,
+      resultImageAssetPath: resultImageAssetPath,
+      hasTouchSound: hasTouchSound,
+    );
+  }
+
+  TI withSound(String sound) {
+    return TI(
+      text: text,
+      imageAssetPath: imageAssetPath,
+      animationFrames: animationFrames,
+      soundAssetPath: sound,
+      alarmTimeInSeconds: alarmTimeInSeconds,
+      isHtml: isHtml,
+      isYoutubeLink: isYoutubeLink,
+      isTouchPage: isTouchPage,
+      resultImageAssetPath: resultImageAssetPath,
+      hasTouchSound: hasTouchSound,
+    );
+  }
+
+  TI withTouchSound() {
+    return TI(
+      text: text,
+      imageAssetPath: imageAssetPath,
+      animationFrames: animationFrames,
+      soundAssetPath: soundAssetPath,
+      alarmTimeInSeconds: alarmTimeInSeconds,
+      isHtml: isHtml,
+      isYoutubeLink: isYoutubeLink,
+      isTouchPage: isTouchPage,
+      resultImageAssetPath: resultImageAssetPath,
+      hasTouchSound: true,
+    );
+  }
+
+  TI asYoutubeLink() {
+    return TI(
+      text: text,
+      imageAssetPath: imageAssetPath,
+      animationFrames: animationFrames,
+      soundAssetPath: soundAssetPath,
+      alarmTimeInSeconds: alarmTimeInSeconds,
+      isHtml: isHtml,
+      isYoutubeLink: true,
+      isTouchPage: isTouchPage,
+      resultImageAssetPath: resultImageAssetPath,
+      hasTouchSound: hasTouchSound,
+    );
+  }
+
+  TI withAlarm(int seconds) {
+    return TI(
+      text: text,
+      imageAssetPath: imageAssetPath,
+      animationFrames: animationFrames,
+      soundAssetPath: soundAssetPath,
+      alarmTimeInSeconds: seconds,
+      isHtml: isHtml,
+      isYoutubeLink: isYoutubeLink,
+      isTouchPage: isTouchPage,
+      resultImageAssetPath: resultImageAssetPath,
+      hasTouchSound: hasTouchSound,
+    );
+  }
+
+  TI asHtml() {
+    return TI(
+      text: text,
+      imageAssetPath: imageAssetPath,
+      animationFrames: animationFrames,
+      soundAssetPath: soundAssetPath,
+      alarmTimeInSeconds: alarmTimeInSeconds,
+      isHtml: true,
+      isYoutubeLink: isYoutubeLink,
+      isTouchPage: isTouchPage,
+      resultImageAssetPath: resultImageAssetPath,
+      hasTouchSound: hasTouchSound,
+    );
+  }
+
+  TI asTouchPage() {
+    return TI(
+      text: text,
+      imageAssetPath: imageAssetPath,
+      animationFrames: animationFrames,
+      soundAssetPath: soundAssetPath,
+      alarmTimeInSeconds: alarmTimeInSeconds,
+      isHtml: isHtml,
+      isYoutubeLink: isYoutubeLink,
+      isTouchPage: true,
+      resultImageAssetPath: resultImageAssetPath,
+      hasTouchSound: hasTouchSound,
+    );
+  }
+
+  TI withResultImage(String image) {
+    return TI(
+      text: text,
+      imageAssetPath: imageAssetPath,
+      animationFrames: animationFrames,
+      soundAssetPath: soundAssetPath,
+      alarmTimeInSeconds: alarmTimeInSeconds,
+      isHtml: isHtml,
+      isYoutubeLink: isYoutubeLink,
+      isTouchPage: isTouchPage,
+      resultImageAssetPath: image,
+      hasTouchSound: hasTouchSound,
+    );
+  }
+
   bool get hasTimer => alarmTimeInSeconds != null && alarmTimeInSeconds! > 0;
-
-  /// 애니메이션이 있는지 확인
-  bool get hasAnimation =>
-      animationFrames != null && animationFrames!.isNotEmpty;
-
-  /// 사운드가 있는지 확인
+  bool get hasAnimation => animationFrames != null && animationFrames!.isNotEmpty;
   bool get hasSound => soundAssetPath != null;
-
-  /// 이미지가 있는지 확인
   bool get hasImage => imageAssetPath != null;
-
-  /// 결과 이미지가 있는지 확인 (타이머 종료 후 보여줄 이미지)
   bool get hasResultImage => resultImageAssetPath != null;
 }

@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../data/day0.dart';
+import '../data/day1.dart';
+import '../data/day2.dart';
+import '../data/day3.dart';
+import '../data/day32.dart';
+import '../data/day4.dart';
+import '../data/day5_fc.dart';
+import '../data/day6_pao.dart';
+import 'day_screen.dart';
 
 /// 메인 화면 - 앱의 허브, 다양한 학습 단계로 이동
 class MainScreen extends StatefulWidget {
@@ -95,8 +104,15 @@ class _MainScreenState extends State<MainScreen> {
                       subtitle: 'Day 0',
                       icon: Icons.play_circle_outline,
                       onPressed: () {
-                        // TODO: Day 0 화면으로 이동
-                        _showComingSoon(context, 'Day 0');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DayScreen(
+                              title: '인트로',
+                              tiArray: Day0.getTiArray(),
+                            ),
+                          ),
+                        );
                       },
                     ),
                     _buildMenuButton(
@@ -105,7 +121,15 @@ class _MainScreenState extends State<MainScreen> {
                       subtitle: 'Day 1',
                       icon: Icons.looks_one,
                       onPressed: () {
-                        _showComingSoon(context, 'Day 1');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DayScreen(
+                              title: '1일차',
+                              tiArray: Day1.getTiArray(),
+                            ),
+                          ),
+                        );
                       },
                     ),
                     _buildMenuButton(
@@ -114,7 +138,15 @@ class _MainScreenState extends State<MainScreen> {
                       subtitle: 'Day 2',
                       icon: Icons.looks_two,
                       onPressed: () {
-                        _showComingSoon(context, 'Day 2');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DayScreen(
+                              title: '2일차',
+                              tiArray: Day2.getTiArray(),
+                            ),
+                          ),
+                        );
                       },
                     ),
                     _buildMenuButton(
@@ -123,7 +155,7 @@ class _MainScreenState extends State<MainScreen> {
                       subtitle: 'Day 3',
                       icon: Icons.looks_3,
                       onPressed: () {
-                        _showComingSoon(context, 'Day 3');
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => DayScreen(title: '3일차', tiArray: Day3.getTiArray())));
                       },
                     ),
                     _buildMenuButton(
@@ -132,7 +164,7 @@ class _MainScreenState extends State<MainScreen> {
                       subtitle: 'Day 3-2',
                       icon: Icons.add_circle_outline,
                       onPressed: () {
-                        _showComingSoon(context, 'Day 3-2');
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => DayScreen(title: '3일차 추가', tiArray: Day32.getTiArray())));
                       },
                     ),
                     _buildMenuButton(
@@ -141,7 +173,7 @@ class _MainScreenState extends State<MainScreen> {
                       subtitle: 'Day 4',
                       icon: Icons.looks_4,
                       onPressed: () {
-                        _showComingSoon(context, 'Day 4');
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => DayScreen(title: '4일차', tiArray: Day4.getTiArray())));
                       },
                     ),
                     const SizedBox(height: 24),
@@ -170,7 +202,7 @@ class _MainScreenState extends State<MainScreen> {
                       icon: Icons.flag,
                       color: Colors.orange,
                       onPressed: () {
-                        _showComingSoon(context, 'First Challenge');
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => DayScreen(title: '첫 번째 도전', tiArray: Day5FC.getTiArray())));
                       },
                     ),
                     _buildMenuButton(
@@ -180,7 +212,7 @@ class _MainScreenState extends State<MainScreen> {
                       icon: Icons.schema,
                       color: Colors.purple,
                       onPressed: () {
-                        _showComingSoon(context, 'PAO 시스템');
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => DayScreen(title: 'PAO 시스템', tiArray: Day6PAO.getTiArray())));
                       },
                     ),
                     _buildMenuButton(
