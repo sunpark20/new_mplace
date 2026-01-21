@@ -14,7 +14,6 @@ import 'num_sample_screen.dart';
 import 'num_prac_screen.dart';
 import 'video_screen.dart';
 
-/// 메인 화면 - 앱의 허브, 다양한 학습 단계로 이동
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -23,14 +22,10 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-
-
   @override
   void initState() {
     super.initState();
   }
-
-
 
   @override
   void dispose() {
@@ -43,7 +38,6 @@ class _MainScreenState extends State<MainScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
-          // 뒤로가기 시 앱 종료
           SystemNavigator.pop();
         }
       },
@@ -54,9 +48,6 @@ class _MainScreenState extends State<MainScreen> {
         ),
         body: Column(
           children: [
-            // 상단 배너 광고
-
-            // 메인 콘텐츠
             Expanded(
               child: SafeArea(
                 top: false,

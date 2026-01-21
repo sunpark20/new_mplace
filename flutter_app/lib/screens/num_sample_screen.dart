@@ -14,15 +14,12 @@ class _NumSampleScreenState extends State<NumSampleScreen> {
   List<Item> items = [];
   bool isLoading = true;
 
-
   @override
   void initState() {
     super.initState();
     super.initState();
     _loadData();
   }
-
-
 
   Future<void> _loadData() async {
     try {
@@ -96,7 +93,6 @@ class _NumSampleScreenState extends State<NumSampleScreen> {
 
   @override
   void dispose() {
-
     super.dispose();
   }
 
@@ -147,7 +143,6 @@ class _NumSampleScreenState extends State<NumSampleScreen> {
       ),
       body: Column(
         children: [
-
             Expanded(
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())

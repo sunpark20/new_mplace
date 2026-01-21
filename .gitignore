@@ -1,5 +1,6 @@
 # Built application files
 *.apk
+*.aab
 *.ap_
 
 # Files for the ART/Dalvik VM
@@ -39,3 +40,12 @@ captures/
 # Keystore files
 *.jks
 *.zip
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+
+# Build output
+신버전/
