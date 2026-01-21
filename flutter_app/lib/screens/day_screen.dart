@@ -32,8 +32,7 @@ class _DayScreenState extends State<DayScreen> {
   DateTime? _lastBackPressTime;
   bool _showExitWarning = false;
   Timer? _exitWarningTimer;
-  
-  // High-five feature
+
   final List<AudioPlayer> _combatPlayers = [];
   final List<_HitEffect> _hitEffects = [];
   final Random _random = Random();
@@ -203,8 +202,6 @@ class _DayScreenState extends State<DayScreen> {
     _loadCurrentPage();
   }
 
-
-
   void _loadCurrentPage() {
     _timerCompleted = false;
     _currentAnimationFrame = 0;
@@ -280,12 +277,11 @@ class _DayScreenState extends State<DayScreen> {
       if (_lastBackPressTime == null ||
           now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
         _lastBackPressTime = now;
-        
-        // Show custom toast
+
         setState(() {
           _showExitWarning = true;
         });
-        
+
         _exitWarningTimer?.cancel();
         _exitWarningTimer = Timer(const Duration(seconds: 2), () {
           if (mounted) {
@@ -319,23 +315,20 @@ class _DayScreenState extends State<DayScreen> {
   }
 
   void _handleHighFiveTouch(Offset position) async {
-    // Limit concurrent sounds to prevent lag
     if (_combatPlayers.length >= 5) {
       final oldPlayer = _combatPlayers.removeAt(0);
       oldPlayer.stop();
       oldPlayer.dispose();
     }
-    
-    // Play random combat sound with new player (allows overlapping)
+
     final soundIndex = _random.nextInt(_combatSounds.length);
     final sound = _combatSounds[soundIndex];
     debugPrint('Playing sound $soundIndex: $sound (total: ${_combatSounds.length})');
     final player = AudioPlayer();
     _combatPlayers.add(player);
-    
+
     try {
       await player.play(AssetSource(sound));
-      // Clean up after sound finishes
       player.onPlayerComplete.listen((_) {
         player.dispose();
         _combatPlayers.remove(player);
@@ -345,8 +338,7 @@ class _DayScreenState extends State<DayScreen> {
       player.dispose();
       _combatPlayers.remove(player);
     }
-    
-    // Add hit effect at touch position (limit to 10 max)
+
     if (_hitEffects.length >= 10) {
       _hitEffects.removeAt(0);
     }
@@ -354,8 +346,7 @@ class _DayScreenState extends State<DayScreen> {
     setState(() {
       _hitEffects.add(effect);
     });
-    
-    // Remove effect after animation
+
     Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) {
         setState(() {
@@ -387,14 +378,12 @@ class _DayScreenState extends State<DayScreen> {
       ),
       body: Column(
         children: [
-
           Expanded(
             child: Stack(
               children: [
                 GestureDetector(
                   onTapDown: (details) {
                     if (ti.hasTouchSound) {
-                      // High-five page - just play sound, don't navigate
                       _handleHighFiveTouch(details.localPosition);
                     } else if (ti.isTouchPage) {
                       _nextPage();
@@ -545,7 +534,6 @@ class _DayScreenState extends State<DayScreen> {
                       ),
                     ),
                   ),
-                // Hit effects for high-five - explosion/dust style
                 ..._hitEffects.map((effect) => Positioned(
                   left: effect.position.dx - 50,
                   top: effect.position.dy - 50,
@@ -555,7 +543,6 @@ class _DayScreenState extends State<DayScreen> {
                       height: 100,
                       child: Stack(
                         children: [
-                          // Outer explosion ring
                           TweenAnimationBuilder<double>(
                             tween: Tween(begin: 0.3, end: 1.5),
                             duration: const Duration(milliseconds: 350),
@@ -582,7 +569,6 @@ class _DayScreenState extends State<DayScreen> {
                               );
                             },
                           ),
-                          // Inner flash
                           TweenAnimationBuilder<double>(
                             tween: Tween(begin: 1.0, end: 0.0),
                             duration: const Duration(milliseconds: 150),
@@ -616,13 +602,13 @@ class _DayScreenState extends State<DayScreen> {
           ),
           SafeArea(
             top: false,
-            bottom: false, // Allow drawing behind home indicator
+            bottom: false,
             child: Container(
               padding: const EdgeInsets.only(
-                left: 16.0, 
-                right: 16.0, 
-                top: 16.0, 
-                bottom: 32.0, // Extra padding for home indicator
+                left: 16.0,
+                right: 16.0,
+                top: 16.0,
+                bottom: 32.0,
               ),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -659,7 +645,6 @@ class _DayScreenState extends State<DayScreen> {
   }
 }
 
-// Helper class for hit effects
 class _HitEffect {
   final Offset position;
   final int id;

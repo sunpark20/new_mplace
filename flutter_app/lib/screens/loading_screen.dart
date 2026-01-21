@@ -31,7 +31,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 로고 또는 앱 제목
             const Text(
               '기억의 궁전',
               style: TextStyle(
@@ -40,7 +39,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // 로딩 인디케이터
             const CircularProgressIndicator(),
           ],
         ),

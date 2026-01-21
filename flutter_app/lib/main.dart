@@ -5,7 +5,6 @@ import 'screens/loading_screen.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 세로 방향 고정
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

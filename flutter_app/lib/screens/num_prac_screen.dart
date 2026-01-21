@@ -25,8 +25,6 @@ class _NumPracScreenState extends State<NumPracScreen> {
   int elapsedSeconds = 0;
   Timer? timer;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -34,8 +32,6 @@ class _NumPracScreenState extends State<NumPracScreen> {
     _loadScore();
     _startNewGame();
   }
-
-
 
   Future<void> _loadScore() async {
     final prefs = await SharedPreferences.getInstance();
@@ -131,7 +127,6 @@ class _NumPracScreenState extends State<NumPracScreen> {
   @override
   void dispose() {
     timer?.cancel();
-
     super.dispose();
   }
 
@@ -168,7 +163,6 @@ class _NumPracScreenState extends State<NumPracScreen> {
       ),
       body: Column(
         children: [
-
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
