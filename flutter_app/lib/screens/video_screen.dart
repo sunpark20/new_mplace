@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import 'package:flutter/services.dart';
+import 'dart:async';
+
 class VideoScreen extends StatefulWidget {
   const VideoScreen({super.key});
 
@@ -17,6 +20,11 @@ class _VideoScreenState extends State<VideoScreen> {
   @override
   void initState() {
     super.initState();
+    // Force landscape mode
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     _initializeVideo();
   }
 
@@ -44,6 +52,10 @@ class _VideoScreenState extends State<VideoScreen> {
 
   @override
   void dispose() {
+    // Reset to portrait mode
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
     _controller?.dispose();
     super.dispose();
   }
@@ -51,11 +63,6 @@ class _VideoScreenState extends State<VideoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('TED 비디오'),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-      ),
       backgroundColor: Colors.black,
       body: Center(
         child: _hasError
@@ -92,6 +99,7 @@ class _VideoScreenState extends State<VideoScreen> {
                       alignment: Alignment.bottomCenter,
                       children: [
                         VideoPlayer(_controller!),
+                        _ControlsOverlay(controller: _controller!),
                         VideoProgressIndicator(
                           _controller!,
                           allowScrubbing: true,
@@ -100,7 +108,6 @@ class _VideoScreenState extends State<VideoScreen> {
                             bufferedColor: Colors.grey,
                           ),
                         ),
-                        _ControlsOverlay(controller: _controller!),
                       ],
                     ),
                   )
@@ -122,10 +129,14 @@ class _ControlsOverlay extends StatefulWidget {
 }
 
 class _ControlsOverlayState extends State<_ControlsOverlay> {
+  bool _isVisible = true;
+  Timer? _hideTimer;
+
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(_videoListener);
+    _startHideTimer();
   }
 
   void _videoListener() {
@@ -134,36 +145,108 @@ class _ControlsOverlayState extends State<_ControlsOverlay> {
     }
   }
 
+  void _startHideTimer() {
+    _hideTimer?.cancel();
+    _hideTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted && widget.controller.value.isPlaying) {
+        setState(() {
+          _isVisible = false;
+        });
+      }
+    });
+  }
+
+  void _toggleVisibility() {
+    setState(() {
+      _isVisible = !_isVisible;
+    });
+    if (_isVisible) {
+      _startHideTimer();
+    }
+  }
+
+  Future<void> _seekRelative(int seconds) async {
+    final currentPosition = await widget.controller.position;
+    final duration = widget.controller.value.duration;
+    if (currentPosition != null) {
+      var newPosition = currentPosition + Duration(seconds: seconds);
+      if (newPosition < Duration.zero) newPosition = Duration.zero;
+      if (newPosition > duration) newPosition = duration;
+      await widget.controller.seekTo(newPosition);
+      _startHideTimer();
+    }
+  }
+
   @override
   void dispose() {
     widget.controller.removeListener(_videoListener);
+    _hideTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        if (mounted) {
-          setState(() {
-            widget.controller.value.isPlaying
-                ? widget.controller.pause()
-                : widget.controller.play();
-          });
-        }
-      },
-      child: Container(
-        color: Colors.transparent,
-        child: Center(
-          child: Icon(
-            widget.controller.value.isPlaying
-                ? Icons.pause_circle_outline
-                : Icons.play_circle_outline,
-            size: 64,
-            color: Colors.white.withValues(alpha: 0.7),
-          ),
-        ),
+      onTap: _toggleVisibility,
+      behavior: HitTestBehavior.opaque,
+      child: Stack(
+        children: [
+          if (_isVisible)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Rewind 10s
+                    IconButton(
+                      onPressed: () => _seekRelative(-10),
+                      iconSize: 48,
+                      icon: const Icon(Icons.replay_10),
+                      color: Colors.white.withOpacity(0.7),
+                    ),
+                    // Play/Pause
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.controller.value.isPlaying
+                              ? widget.controller.pause()
+                              : widget.controller.play();
+                        });
+                        _startHideTimer();
+                      },
+                      iconSize: 80,
+                      icon: Icon(
+                        widget.controller.value.isPlaying
+                            ? Icons.pause_circle_filled
+                            : Icons.play_circle_fill,
+                      ),
+                      color: Colors.white,
+                    ),
+                    // Forward 10s
+                    IconButton(
+                      onPressed: () => _seekRelative(10),
+                      iconSize: 48,
+                      icon: const Icon(Icons.forward_10),
+                      color: Colors.white.withOpacity(0.7),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+             // Back Button
+            if (_isVisible)
+              Positioned(
+                top: 40,
+                left: 20,
+                child: IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
+                ),
+              ),
+        ],
       ),
     );
   }
 }
+

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/ti.dart';
 
@@ -390,7 +391,7 @@ class _DayScreenState extends State<DayScreen> {
                     }
                   },
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: EdgeInsets.zero,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -399,7 +400,8 @@ class _DayScreenState extends State<DayScreen> {
                             padding: const EdgeInsets.only(bottom: 16.0),
                             child: Image.asset(
                               ti.imageAssetPath!,
-                              fit: BoxFit.contain,
+                              width: double.infinity,
+                              fit: BoxFit.fitWidth,
                               errorBuilder: (context, error, stackTrace) {
                                 debugPrint(
                                     'Error loading image ${ti.imageAssetPath}: $error');
@@ -419,7 +421,8 @@ class _DayScreenState extends State<DayScreen> {
                             padding: const EdgeInsets.only(bottom: 16.0),
                             child: Image.asset(
                               ti.resultImageAssetPath!,
-                              fit: BoxFit.contain,
+                              width: double.infinity,
+                              fit: BoxFit.fitWidth,
                               errorBuilder: (context, error, stackTrace) {
                                 debugPrint(
                                     'Error loading result image ${ti.resultImageAssetPath}: $error');
@@ -435,11 +438,10 @@ class _DayScreenState extends State<DayScreen> {
                             ),
                           ),
                         if (ti.hasAnimation && ti.animationFrames!.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
-                            child: Image.asset(
+                            Image.asset(
                               ti.animationFrames![_currentAnimationFrame],
-                              fit: BoxFit.contain,
+                              width: double.infinity,
+                              fit: BoxFit.fitWidth,
                               errorBuilder: (context, error, stackTrace) {
                                 debugPrint(
                                     'Error loading animation frame: $error');
@@ -452,22 +454,45 @@ class _DayScreenState extends State<DayScreen> {
                                 );
                               },
                             ),
-                          ),
                         if (ti.isHtml)
-                          Html(
-                            data: ti.text,
-                            onLinkTap: (url, attributes, element) {
-                              debugPrint('Link tapped: $url');
-                            },
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Html(
+                              data: ti.text,
+                              style: {
+                                "body": Style(
+                                  fontSize: FontSize(18.0),
+                                  lineHeight: LineHeight(1.6),
+                                ),
+                              },
+                              onLinkTap: (url, attributes, element) async {
+                                debugPrint('Link tapped: $url');
+                                if (url != null) {
+                                  final uri = Uri.parse(url);
+                                  try {
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                    } else {
+                                      debugPrint('Could not launch $url');
+                                    }
+                                  } catch (e) {
+                                    debugPrint('Error launching url: $e');
+                                  }
+                                }
+                              },
+                            ),
                           )
-                        else
-                          Text(
-                            ti.text,
-                            style: const TextStyle(fontSize: 16, height: 1.6),
+                      else
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Text(
+                              ti.text,
+                              style: const TextStyle(fontSize: 18, height: 1.6),
+                            ),
                           ),
                         if (ti.hasTimer && _remainingSeconds > 0)
                           Padding(
-                            padding: const EdgeInsets.only(top: 24.0),
+                            padding: const EdgeInsets.only(top: 24.0, left: 16.0, right: 16.0),
                             child: Column(
                               children: [
                                 Text(
@@ -489,7 +514,7 @@ class _DayScreenState extends State<DayScreen> {
                           ),
                         if (ti.isYoutubeLink)
                           Padding(
-                            padding: const EdgeInsets.only(top: 24.0),
+                            padding: const EdgeInsets.only(top: 24.0, left: 16.0, right: 16.0),
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 try {
@@ -515,6 +540,7 @@ class _DayScreenState extends State<DayScreen> {
                               ),
                             ),
                           ),
+                        const SizedBox(height: 32), // Add bottom padding for better scrolling
                       ],
                     ),
                   ),
