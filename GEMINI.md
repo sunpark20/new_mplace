@@ -89,3 +89,21 @@
 *   **Structure**: Mirroring `TI` structure in Dart.
 
 *   **Video**: Switched from External Intent (Java) to In-App `VideoPlayer` (Flutter).
+
+## 6. Troubleshooting / iOS
+From experience, debugging on physical iOS devices in this environment requires specific handling:
+
+1.  **Always use Release Mode**:
+    *   Command: `flutter run --release`
+    *   Debug mode often fails with JIT compilation errors or infinite hanging.
+
+2.  **Fixing "Installing and launching..." Hangs**:
+    *   If the process hangs during installation:
+        1.  Kill stuck processes: `pkill -9 -f "flutter.*"` and `pkill -9 -f idevicesyslog`
+        2.  Clean build: `flutter clean` && `flutter pub get`
+        3.  Retry: `flutter run --release -d <device_id>`
+
+3.  **Alternative (Xcode)**:
+    *   Open `ios/Runner.xcworkspace` in Xcode.
+    *   Select device and change Scheme to **Release** (Product > Scheme > Edit Scheme).
+    *   Run (Cmd+R).
