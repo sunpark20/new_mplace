@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 import '../models/item.dart';
 
 class NumSampleScreen extends StatefulWidget {
@@ -13,34 +13,16 @@ class NumSampleScreen extends StatefulWidget {
 class _NumSampleScreenState extends State<NumSampleScreen> {
   List<Item> items = [];
   bool isLoading = true;
-  BannerAd? _bannerAd;
-  bool _isBannerLoaded = false;
+
 
   @override
   void initState() {
     super.initState();
-    _loadBannerAd();
+    super.initState();
     _loadData();
   }
 
-  void _loadBannerAd() {
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (_) {
-          setState(() {
-            _isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-        },
-      ),
-    );
-    _bannerAd?.load();
-  }
+
 
   Future<void> _loadData() async {
     try {
@@ -114,7 +96,7 @@ class _NumSampleScreenState extends State<NumSampleScreen> {
 
   @override
   void dispose() {
-    _bannerAd?.dispose();
+
     super.dispose();
   }
 
@@ -165,55 +147,54 @@ class _NumSampleScreenState extends State<NumSampleScreen> {
       ),
       body: Column(
         children: [
-          if (_isBannerLoaded && _bannerAd != null)
-            SizedBox(
-              height: _bannerAd!.size.height.toDouble(),
-              child: AdWidget(ad: _bannerAd!),
-            ),
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : GridView.builder(
-                    padding: const EdgeInsets.all(8),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 5,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                      childAspectRatio: 1.2,
-                    ),
-                    itemCount: displayList.length,
-                    itemBuilder: (context, index) {
-                      final number = displayList[index];
-                      return InkWell(
-                        onTap: () {
-                          if (index < items.length) {
-                            _showItemDialog(items[index]);
-                          }
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurple.shade50,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: Colors.deepPurple.shade200,
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              number,
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.deepPurple.shade700,
+
+            Expanded(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SafeArea(
+                      top: false,
+                      child: GridView.builder(
+                        padding: const EdgeInsets.all(8),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 5,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                          childAspectRatio: 1.2,
+                        ),
+                        itemCount: displayList.length,
+                        itemBuilder: (context, index) {
+                          final number = displayList[index];
+                          return InkWell(
+                            onTap: () {
+                              if (index < items.length) {
+                                _showItemDialog(items[index]);
+                              }
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.deepPurple.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.deepPurple.shade200,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  number,
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.deepPurple.shade700,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
+                          );
+                        },
+                      ),
+                    ),
+            ),
         ],
       ),
     );

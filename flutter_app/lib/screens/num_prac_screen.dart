@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NumPracScreen extends StatefulWidget {
@@ -25,35 +25,17 @@ class _NumPracScreenState extends State<NumPracScreen> {
   int elapsedSeconds = 0;
   Timer? timer;
 
-  BannerAd? _bannerAd;
-  bool _isBannerLoaded = false;
+
 
   @override
   void initState() {
     super.initState();
-    _loadBannerAd();
+    super.initState();
     _loadScore();
     _startNewGame();
   }
 
-  void _loadBannerAd() {
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (_) {
-          setState(() {
-            _isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-        },
-      ),
-    );
-    _bannerAd?.load();
-  }
+
 
   Future<void> _loadScore() async {
     final prefs = await SharedPreferences.getInstance();
@@ -149,7 +131,7 @@ class _NumPracScreenState extends State<NumPracScreen> {
   @override
   void dispose() {
     timer?.cancel();
-    _bannerAd?.dispose();
+
     super.dispose();
   }
 
@@ -186,11 +168,7 @@ class _NumPracScreenState extends State<NumPracScreen> {
       ),
       body: Column(
         children: [
-          if (_isBannerLoaded && _bannerAd != null)
-            SizedBox(
-              height: _bannerAd!.size.height.toDouble(),
-              child: AdWidget(ad: _bannerAd!),
-            ),
+
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -274,51 +252,58 @@ class _NumPracScreenState extends State<NumPracScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
+          SafeArea(
+            top: false,
+            child: Column(
               children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: isGameFinished ? null : _onIncorrect,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.all(24),
-                      textStyle: const TextStyle(fontSize: 20),
-                    ),
-                    child: const Text('오답'),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: isGameFinished ? null : _onIncorrect,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.all(24),
+                            textStyle: const TextStyle(fontSize: 20),
+                          ),
+                          child: const Text('오답'),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: isGameFinished ? null : _onCorrect,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.all(24),
+                            textStyle: const TextStyle(fontSize: 20),
+                          ),
+                          child: const Text('정답'),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: isGameFinished ? null : _onCorrect,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.all(24),
-                      textStyle: const TextStyle(fontSize: 20),
+                if (isGameFinished)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: ElevatedButton.icon(
+                      onPressed: _startNewGame,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('새 게임 시작'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
+                      ),
                     ),
-                    child: const Text('정답'),
                   ),
-                ),
               ],
             ),
           ),
-          if (isGameFinished)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: ElevatedButton.icon(
-                onPressed: _startNewGame,
-                icon: const Icon(Icons.refresh),
-                label: const Text('새 게임 시작'),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                ),
-              ),
-            ),
         ],
       ),
     );

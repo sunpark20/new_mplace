@@ -1,3 +1,6 @@
+# 항상 확인하고 질문대답 / 작업시작 하기
+"⚠️ 작업 전 지침.md 필독" 확인 
+
 # memory_palace
 
 A new Flutter project.

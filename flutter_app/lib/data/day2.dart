@@ -22,9 +22,9 @@ class Day2 {
         imageAssetPath: 'assets/images/d1_5.png',
       ),
       TI(
-        text: "숫자0을 자신만의 축구공으로 바꿔봅시다." + w,
+        text: "숫자0을 자신만의 축구공으로 바꿔봅시다.$w",
         imageAssetPath: 'assets/images/d1_4.png',
-        animationFrames: ['assets/images/d1_8_ani.png'],
+
       ).withAlarm(15),
       TI(
         text: "0은 축구공입니다.",
@@ -35,44 +35,49 @@ class Day2 {
         imageAssetPath: 'assets/images/d1_9.png',
       ),
       TI(
-        text: "숫자1을 바꿔 봅시다.\n   ▽\n이번 올림픽에서 멋지게 활약했던 박상영 선수네요.\n   ▽\n검이 1과 비슷하게 생겼네요." + w,
+        text: "숫자1을 바꿔 봅시다.\n   ▽\n이번 올림픽에서 멋지게 활약했던 박상영 선수네요.\n   ▽\n검이 1과 비슷하게 생겼네요.$w",
         imageAssetPath: 'assets/images/d1_10_2.png',
-        animationFrames: ['assets/images/d1_10_ani.png'],
+
       ).withAlarm(15),
       TI(
         text: "1은 검입니다.\n   ▽\n찔리면 엄청 아프겠어요.",
         imageAssetPath: 'assets/images/d1_10_1.png',
       ),
       TI(
-        text: "숫자2를 바꿔 봅시다.\n   ▽\n호수위의 백조, 숫자 2와 닮았나요?" + w,
-        animationFrames: ['assets/images/d1_12_ani.png'],
+        text: "숫자2를 바꿔 봅시다.\n   ▽\n호수위의 백조, 숫자 2와 닮았나요?$w",
+        animationFrames: [
+          'assets/images/d1_12_1.png',
+          'assets/images/d1_12_2.png',
+          'assets/images/d1_12_3.png',
+          'assets/images/d1_12_4.png'
+        ],
       ).withAlarm(15).withResultImage('assets/images/d1_13.png'),
       TI(
         text: "2는 백조입니다.",
         imageAssetPath: 'assets/images/d1_13.png',
       ),
       TI(
-        text: "숫자3 바꿔 봅시다.\n   ▽\n갈매기를 옆으로 돌리면 3과 비슷합니다. 어디서 바다짠내도 나지 않아요?" + w,
+        text: "숫자3 바꿔 봅시다.\n   ▽\n갈매기를 옆으로 돌리면 3과 비슷합니다. 어디서 바다짠내도 나지 않아요?$w",
         imageAssetPath: 'assets/images/d1_14.png',
-        animationFrames: ['assets/images/d1_14_ani.png'],
+
       ).withSound('assets/sounds/seagull.mp3').withAlarm(15),
       TI(
         text: "3은 갈매기입니다.",
         imageAssetPath: 'assets/images/d1_14_1.png',
       ),
       TI(
-        text: "숫자4를 바꿔 봅시다.\n   ▽\n요트 타보셨나요?" + w,
+        text: "숫자4를 바꿔 봅시다.\n   ▽\n요트 타보셨나요?$w",
         imageAssetPath: 'assets/images/d1_16.png',
-        animationFrames: ['assets/images/d1_16_ani.png'],
+
       ).withAlarm(15),
       TI(
         text: "4는 요트입니다.",
         imageAssetPath: 'assets/images/d1_16_1.png',
       ),
       TI(
-        text: "숫자5를 바꿔 봅시다.\n   ▽\n5에 찔리면 엄청 아프겠네요." + w,
+        text: "숫자5를 바꿔 봅시다.\n   ▽\n5에 찔리면 엄청 아프겠네요.$w",
         imageAssetPath: 'assets/images/d1_18.png',
-        animationFrames: ['assets/images/d1_18_ani.png'],
+
       ).withAlarm(15),
       TI(
         text: "5는 낚시바늘 입니다.\n   ▽\n베이거나 찔리는 상상은 기억에 잘 남습니다",
@@ -81,7 +86,7 @@ class Day2 {
       TI(
         text: "숫자6을 바꿔 봅시다.\n   ▽\n빠알간 앵두네요. 숫자 6이 보이시나요??",
         imageAssetPath: 'assets/images/d1_20.png',
-        animationFrames: ['assets/images/d1_20_ani.png'],
+
       ).withAlarm(15),
       TI(
         text: "6은 새빨간 앵두입니다. 거의 다 왔습니다.",
@@ -90,7 +95,7 @@ class Day2 {
       TI(
         text: "숫자7을 바꿔 봅시다.\n   ▽\n꼬부랑 할머니의 지팡이가 7과 닮았네요.",
         imageAssetPath: 'assets/images/d1_22.png',
-        animationFrames: ['assets/images/d1_22_ani.png'],
+
       ).withAlarm(15),
       TI(
         text: "7은 꼬부랑 할머니의 지팡이 입니다.",
@@ -99,7 +104,7 @@ class Day2 {
       TI(
         text: "숫자8을 바꿔 봅시다.\n   ▽\n눈사람, 8과 비슷한가요.\n   ▽\n이름은 올라프구요, 우리집 냉장고에 삽니다.",
         imageAssetPath: 'assets/images/d1_24.png',
-        animationFrames: ['assets/images/d1_24_ani.png'],
+
       ).withAlarm(15),
       TI(
         text: "8은 눈사람입니다. 다음으로 가볼까요?",
@@ -108,7 +113,7 @@ class Day2 {
       TI(
         text: "숫자9를 바꿔 봅시다. 구구콘!! 9와 안닮았지만.. 그냥 하세요..\n   ▽\nppl 아닙니다ㅜㅜ",
         imageAssetPath: 'assets/images/d1_26.png',
-        animationFrames: ['assets/images/d1_26_ani.png'],
+
       ).withAlarm(15),
       TI(
         text: "9는 구구콘입니다.\n   ▽\n 다음으로 가볼까요?",

@@ -19,44 +19,65 @@ class Day1 {
       ),
       TI(
         text: "다음 페이지부터 지시를 따르시면 됩니다.\n1.준비물이 뭔지 확인 한다.\n   ▽\n2.준비물과 결합할 자신의 신체부위를 확인한다.▽\n3.눈을 감고 준비물을 몸에 붙이는 상상을 한다.\n   ▽\n준비가 됐다면 다음을 눌러 시작해 봅시다!",
-        animationFrames: ['assets/images/d1_3_ani.png'],
+        animationFrames: [
+          'assets/images/d1_3_1.png',
+          'assets/images/d1_3_2.png',
+          'assets/images/d1_3_3.png',
+          'assets/images/d1_3_4.png'
+        ],
       ),
       TI(
-        text: "준비물1. 8절지 스케치북 - 머리\n   ▽\n스케치북을 8모양으로 잘라 내 머리에 붙였네요. 어허허허 이쁘죠.\n   ▽\n팔랑팔랑 거려요 펄렁 펄렁..." + w,
+        text: "준비물1. 8절지 스케치북 - 머리\n   ▽\n스케치북을 8모양으로 잘라 내 머리에 붙였네요. 어허허허 이쁘죠.\n   ▽\n팔랑팔랑 거려요 펄렁 펄렁...$w",
         imageAssetPath: 'assets/images/d2_6.png',
       ).withSound('assets/sounds/paper.mp3'),
       TI(
-        text: "준비물2. 드로잉 재료 - 눈\n   ▽\n드로잉재료를 이용해 눈을 크게 그렸군요. 눈썹도 찐하게 만들구요. 여자분들은 알아서 그리세요.." + w,
-        animationFrames: ['assets/images/d2_6_ani.png'],
+        text: "준비물2. 드로잉 재료 - 눈\n   ▽\n드로잉재료를 이용해 눈을 크게 그렸군요. 눈썹도 찐하게 만들구요. 여자분들은 알아서 그리세요..$w",
+        animationFrames: [
+          'assets/images/d2_6_1.png',
+          'assets/images/d2_6_2.png',
+          'assets/images/d2_6_3.png',
+          'assets/images/d2_6_4.png'
+        ],
       ).withSound('assets/sounds/pencil.mp3'),
       TI(
-        text: "준비물3. U모양 자석 - 콧구멍\n   ▽\n자석을 콧구멍에 꽂았더니 크허엏어어어크킁 정건기가꾸아아악. 팁 - 콧구멍에 손가락도 넣어보고, 감전된 것처럼 몸도 떨면 잘 외워집니다.(진짜)" + w,
-        animationFrames: ['assets/images/d2_7_ani.png'],
+        text: "준비물3. U모양 자석 - 콧구멍\n   ▽\n자석을 콧구멍에 꽂았더니 크허엏어어어크킁 정건기가꾸아아악. 팁 - 콧구멍에 손가락도 넣어보고, 감전된 것처럼 몸도 떨면 잘 외워집니다.(진짜)$w",
+        animationFrames: [
+          'assets/images/d2_7_1.png',
+          'assets/images/d2_7_2.png'
+        ],
       ).withSound('assets/sounds/lightning.mp3'),
       TI(
-        text: "준비물4. 아주 가는 철사 - 입\n   ▽\n철사를 이용해서 입을 사이보그로 DIY했군요. 이빨모양- lllll. 윙~ 치킨 ~~ 윙윙치킨!! 냠냠냠 치킨" + w,
-        animationFrames: ['assets/images/d2_8_ani.png'],
-      ).withSound('assets/sounds/robot.mp3'),
+        text: "준비물4. 아주 가는 철사 - 입\n   ▽\n철사를 이용해서 입을 사이보그로 DIY했군요. 이빨모양- lllll. 윙~ 치킨 ~~ 윙윙치킨!! 냠냠냠 치킨$w",
+        animationFrames: [
+          'assets/images/d2_8_1.png',
+          'assets/images/d2_8_2.png',
+          'assets/images/d2_8_3.png'
+        ],
+      ).withSound('assets/sounds/robot.wav'),
       TI(
-        text: "준비물5. 탬버린 - 목\n   ▽\n탬버린을 목에 걸다니..우와 왕년에 노래방가서 좀 흔드셨나봐요." + w,
-        animationFrames: ['assets/images/d2_9_ani.png'],
+        text: "준비물5. 탬버린 - 목\n   ▽\n탬버린을 목에 걸다니..우와 왕년에 노래방가서 좀 흔드셨나봐요.$w",
+        animationFrames: [
+          'assets/images/d2_9_1.png',
+          'assets/images/d2_9_2.png',
+          'assets/images/d2_9_3.png'
+        ],
       ).withSound('assets/sounds/tambourine.mp3'),
       TI(
-        text: "준비물6. 등산용 양말 - 가슴\n   ▽\n양말을 연결해서 브라자를 만들어봐요.\n 킁크읔킁!!!! 그런데 꼬락내가 엄청 나네요.. 한번 이틀동안 신었던 양말냄새를 떠올려보세요. 으으..킁킁" + w,
+        text: "준비물6. 등산용 양말 - 가슴\n   ▽\n양말을 연결해서 브라자를 만들어봐요.\n 킁크읔킁!!!! 그런데 꼬락내가 엄청 나네요.. 한번 이틀동안 신었던 양말냄새를 떠올려보세요. 으으..킁킁$w",
         imageAssetPath: 'assets/images/d2_10.png',
-      ),
+      ).withSound('assets/sounds/vomit.mp3'),
       TI(
-        text: "준비물7. 점토 - 손\n   ▽\n점토를 손에 발라 왕주먹이 되었습니다. 철퍽철퍽~~ 쭈걱쭈걱 슥싹쓱싹??" + w,
+        text: "준비물7. 점토 - 손\n   ▽\n점토를 손에 발라 왕주먹이 되었습니다. 철퍽철퍽~~ 쭈걱쭈걱 슥싹쓱싹??$w",
         imageAssetPath: 'assets/images/d2_11.png',
       ).withSound('assets/sounds/soil.mp3'),
       TI(
-        text: "준비물8. 마이크 - 배\n   ▽\n배에 마이크를 붙였더니 꼬르륵 소리가 잘들리네요.\n여기서 실제로는 배가 손보다 위에 있는데요? 하시는 분들은 순서를 바꿔서 외워주세요." + w,
+        text: "준비물8. 마이크 - 배\n   ▽\n배에 마이크를 붙였더니 꼬르륵 소리가 잘들리네요.\n여기서 실제로는 배가 손보다 위에 있는데요? 하시는 분들은 순서를 바꿔서 외워주세요.$w",
         imageAssetPath: 'assets/images/d2_12.png',
       ).withSound('assets/sounds/stomachgrowl.mp3'),
       TI(
-        text: "준비물9. 해바라기 - 무릎\n   ▽\n무릎에 예쁜 해바라기를 달았네요. 해바라기들이 해를 바라보고 있네요.\n+9 해바라기 각반 장착!!" + w,
+        text: "준비물9. 해바라기 - 무릎\n   ▽\n무릎에 예쁜 해바라기를 달았네요. 해바라기들이 해를 바라보고 있네요.\n+9 해바라기 각반 장착!!$w",
         imageAssetPath: 'assets/images/d2_13.png',
-      ),
+      ).withSound('assets/sounds/EquipArmorDouble.mp3'),
       TI(
         text: "준비물10. 돋보기 - 발\n   ▽\n띠오잉~ 발이 크게 보여요.\n   ▽\n입으로 띠오잉 하고 효과음을 내셔야해요. 내셔야한다구요..",
         imageAssetPath: 'assets/images/d2_14.png',
