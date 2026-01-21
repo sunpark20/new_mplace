@@ -35,6 +35,7 @@ class _DayScreenState extends State<DayScreen> {
   Timer? _exitWarningTimer;
 
   final List<AudioPlayer> _combatPlayers = [];
+  Offset _shakeOffset = Offset.zero;
   final List<_HitEffect> _hitEffects = [];
   final Random _random = Random();
   
@@ -316,6 +317,19 @@ class _DayScreenState extends State<DayScreen> {
   }
 
   void _handleHighFiveTouch(Offset position) async {
+    // Shake effect
+    setState(() {
+      _shakeOffset = Offset(
+          (_random.nextDouble() - 0.5) * 20, (_random.nextDouble() - 0.5) * 20);
+    });
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (mounted) {
+        setState(() {
+          _shakeOffset = Offset.zero;
+        });
+      }
+    });
+
     if (_combatPlayers.length >= 5) {
       final oldPlayer = _combatPlayers.removeAt(0);
       oldPlayer.stop();
@@ -390,7 +404,9 @@ class _DayScreenState extends State<DayScreen> {
                       _nextPage();
                     }
                   },
-                  child: SingleChildScrollView(
+                  child: Transform.translate(
+                    offset: _shakeOffset,
+                    child: SingleChildScrollView(
                     padding: EdgeInsets.zero,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -442,6 +458,7 @@ class _DayScreenState extends State<DayScreen> {
                               ti.animationFrames![_currentAnimationFrame],
                               width: double.infinity,
                               fit: BoxFit.fitWidth,
+                              gaplessPlayback: true,
                               errorBuilder: (context, error, stackTrace) {
                                 debugPrint(
                                     'Error loading animation frame: $error');
@@ -543,8 +560,8 @@ class _DayScreenState extends State<DayScreen> {
                         const SizedBox(height: 32), // Add bottom padding for better scrolling
                       ],
                     ),
-                  ),
-                ),
+                    ),
+                ),),
                 if (_showExitWarning)
                   Center(
                     child: Container(
@@ -584,10 +601,12 @@ class _DayScreenState extends State<DayScreen> {
                                       shape: BoxShape.circle,
                                       gradient: RadialGradient(
                                         colors: [
-                                          Colors.orange.withOpacity(0.8),
-                                          Colors.red.withOpacity(0.4),
+                                          Colors.white,
+                                          Colors.yellow,
+                                          Colors.red,
                                           Colors.transparent,
                                         ],
+                                        stops: const [0.0, 0.2, 0.6, 1.0],
                                       ),
                                     ),
                                   ),
