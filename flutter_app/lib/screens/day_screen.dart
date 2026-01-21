@@ -36,9 +36,34 @@ class _DayScreenState extends State<DayScreen> {
 
   final List<AudioPlayer> _combatPlayers = [];
   Offset _shakeOffset = Offset.zero;
+
+  Timer? _flashTimer;
+  bool _showPreviousPagePreview = false;
+  bool _triggerFlashOnLoad = false;
   final List<_HitEffect> _hitEffects = [];
   final Random _random = Random();
   
+
+  static const List<String> _alarmSounds = [
+    'assets/sounds/alarm/ArrangedTeamInvitation.wav',
+    'assets/sounds/alarm/ClanInvitation.wav',
+    'assets/sounds/alarm/DuskWolf.wav',
+    'assets/sounds/alarm/GoldMineRunningOut1.wav',
+    'assets/sounds/alarm/Hint.wav',
+    'assets/sounds/alarm/MapPing.wav',
+    'assets/sounds/alarm/NewTournament.wav',
+    'assets/sounds/alarm/OrcMAinGlueScreenBear02.wav',
+    'assets/sounds/alarm/OrcMAinGlueScreenBear03.wav',
+    'assets/sounds/alarm/PeasantBuildingComplete1.wav',
+    'assets/sounds/alarm/QuestCompleted.wav',
+    'assets/sounds/alarm/QuestFailed.wav',
+    'assets/sounds/alarm/QuestNew.wav',
+    'assets/sounds/alarm/Rescue.wav',
+    'assets/sounds/alarm/SecretFound.wav',
+    'assets/sounds/alarm/UpkeepRing.wav',
+    'assets/sounds/alarm/Warning.wav',
+  ];
+
   static const List<String> _combatSounds = [
     'sounds/combat/AxeMediumChopWood1.wav',
     'sounds/combat/AxeMediumChopWood2.wav',
@@ -222,17 +247,57 @@ class _DayScreenState extends State<DayScreen> {
     if (ti.hasAnimation && ti.animationFrames!.length > 1) {
       _startAnimation(ti.animationFrames!.length);
     }
+
+    if (_triggerFlashOnLoad) {
+      _triggerFlashOnLoad = false;
+      _runFlashEffect();
+    }
   }
 
   void _playSound(String path) async {
     try {
-      final cleanPath = path.replaceFirst('assets/', '');
+      String actualPath = path;
+      if (path == 'random') {
+        actualPath = _alarmSounds[_random.nextInt(_alarmSounds.length)];
+      }
+
+      final cleanPath = actualPath.replaceFirst('assets/', '');
       await _audioPlayer.stop();
-      await _audioPlayer.play(AssetSource(cleanPath));
+      if (cleanPath.contains('seagull.mp3')) {
+        await _audioPlayer.setSource(AssetSource(cleanPath));
+        await _audioPlayer.seek(const Duration(seconds: 2));
+        await _audioPlayer.resume();
+      } else {
+        await _audioPlayer.play(AssetSource(cleanPath));
+      }
     } catch (e) {
       debugPrint('Error playing sound: $e');
     }
   }
+
+  void _runFlashEffect() {
+    int flashCount = 0;
+    const int totalFlashes = 6; // 3 cycles
+
+    _flashTimer?.cancel();
+    _flashTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (mounted) {
+        setState(() {
+          _showPreviousPagePreview = !_showPreviousPagePreview;
+        });
+        flashCount++;
+
+        if (flashCount >= totalFlashes) {
+          timer.cancel();
+          setState(() {
+            _showPreviousPagePreview = false;
+          });
+        }
+      }
+    });
+  }
+
+
 
   void _startTimer(int seconds) {
     setState(() {
@@ -248,6 +313,14 @@ class _DayScreenState extends State<DayScreen> {
           } else {
             _timerCompleted = true;
             timer.cancel();
+            if (_currentPage < widget.tiArray.length - 1) {
+              final randomSound = _alarmSounds[_random.nextInt(_alarmSounds.length)];
+              _playSound(randomSound);
+              _triggerFlashOnLoad = true;
+              _nextPage();
+            } else {
+              _nextPage();
+            }
           }
         });
       }
@@ -266,6 +339,9 @@ class _DayScreenState extends State<DayScreen> {
   }
 
   void _nextPage() {
+    _flashTimer?.cancel();
+    _showPreviousPagePreview = false;
+    // _triggerFlashOnLoad = false; // Keep it if set by timer
     if (_currentPage < widget.tiArray.length - 1) {
       _countdownTimer?.cancel();
       _animationTimer?.cancel();
@@ -299,6 +375,9 @@ class _DayScreenState extends State<DayScreen> {
   }
 
   void _previousPage() {
+    _flashTimer?.cancel();
+    _showPreviousPagePreview = false;
+    _triggerFlashOnLoad = false;
     if (_currentPage > 0) {
       _countdownTimer?.cancel();
       _animationTimer?.cancel();
@@ -373,6 +452,7 @@ class _DayScreenState extends State<DayScreen> {
 
   @override
   void dispose() {
+    _flashTimer?.cancel();
     _countdownTimer?.cancel();
     _animationTimer?.cancel();
     _audioPlayer.dispose();
@@ -414,8 +494,10 @@ class _DayScreenState extends State<DayScreen> {
                         if (ti.hasImage && (!ti.hasTimer || !_timerCompleted))
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16.0),
-                            child: Image.asset(
-                              ti.imageAssetPath!,
+                            child: Stack(
+                              children: [
+                                Image.asset(
+                                  ti.imageAssetPath!,
                               width: double.infinity,
                               fit: BoxFit.fitWidth,
                               errorBuilder: (context, error, stackTrace) {
@@ -431,7 +513,72 @@ class _DayScreenState extends State<DayScreen> {
                                 );
                               },
                             ),
+                            if (_showPreviousPagePreview && _currentPage > 0)
+                              Builder(builder: (context) {
+                                final prevTi = widget.tiArray[_currentPage - 1];
+                                final imagePath = prevTi.hasImage
+                                    ? prevTi.imageAssetPath
+                                    : (prevTi.hasAnimation &&
+                                            prevTi.animationFrames!.isNotEmpty
+                                        ? prevTi.animationFrames![0]
+                                        : null);
+
+                                if (imagePath != null) {
+                                  return Positioned.fill(
+                                    child: Image.asset(
+                                      imagePath,
+                                      width: double.infinity,
+                                      fit: BoxFit.fitWidth,
+                                      key: ValueKey('preview_prev_image_$imagePath'),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }),
+                            if (ti.hasTimer && _remainingSeconds > 0) ...[
+                              Positioned(
+                                top: 16,
+                                left: 16,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.5),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: const Text(
+                                    "눈을 감고\n상상해보세요",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 16,
+                                right: 16,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.5),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    _formatTime(_remainingSeconds),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              ],
+                            ],
                           ),
+                        ),
                         if (ti.hasResultImage && _timerCompleted)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16.0),
@@ -454,6 +601,8 @@ class _DayScreenState extends State<DayScreen> {
                             ),
                           ),
                         if (ti.hasAnimation && ti.animationFrames!.isNotEmpty)
+                          Stack(
+                            children: [
                             Image.asset(
                               ti.animationFrames![_currentAnimationFrame],
                               width: double.infinity,
@@ -471,6 +620,72 @@ class _DayScreenState extends State<DayScreen> {
                                 );
                               },
                             ),
+                            if (_showPreviousPagePreview && _currentPage > 0)
+                              Builder(builder: (context) {
+                                final prevTi = widget.tiArray[_currentPage - 1];
+                                final imagePath = prevTi.hasImage
+                                    ? prevTi.imageAssetPath
+                                    : (prevTi.hasAnimation &&
+                                            prevTi.animationFrames!.isNotEmpty
+                                        ? prevTi.animationFrames![0]
+                                        : null);
+
+                                if (imagePath != null) {
+                                  return Positioned.fill(
+                                    child: Image.asset(
+                                      imagePath,
+                                      width: double.infinity,
+                                      fit: BoxFit.fitWidth,
+                                      key: ValueKey(
+                                          'preview_prev_anim_image_$imagePath'),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }),
+                            if (ti.hasTimer && _remainingSeconds > 0) ...[
+                              Positioned(
+                                top: 16,
+                                left: 16,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.5),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: const Text(
+                                    "눈을 감고\n상상해보세요",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 16,
+                                right: 16,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.5),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    _formatTime(_remainingSeconds),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                         if (ti.isHtml)
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -507,28 +722,7 @@ class _DayScreenState extends State<DayScreen> {
                               style: const TextStyle(fontSize: 18, height: 1.6),
                             ),
                           ),
-                        if (ti.hasTimer && _remainingSeconds > 0)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 24.0, left: 16.0, right: 16.0),
-                            child: Column(
-                              children: [
-                                Text(
-                                  _formatTime(_remainingSeconds),
-                                  style: const TextStyle(
-                                    fontSize: 48,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.deepPurple,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                LinearProgressIndicator(
-                                  value: 1 -
-                                      (_remainingSeconds /
-                                          ti.alarmTimeInSeconds!),
-                                ),
-                              ],
-                            ),
-                          ),
+                        
                         if (ti.isYoutubeLink)
                           Padding(
                             padding: const EdgeInsets.only(top: 24.0, left: 16.0, right: 16.0),

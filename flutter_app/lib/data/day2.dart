@@ -6,11 +6,11 @@ class Day2 {
   static List<TI> getTiArray() {
     return [
       TI(
-        text: "뇌가 잘 기억하지 못하는 것을 기억하기 쉬운 것으로 바꾸기!!\n   ▽\n(기억하기 어려운)숫자를 (기억하기 쉬운)이미지로 바꿔 봅시다.",
+        text: "뇌가 잘 기억하지 못하는 것을 기억하기 쉬운 것으로 바꾸기!!\n   ▽\n(기억하기 어려운)숫자를\n\n(기억하기 쉬운)이미지로 바꿔 봅시다.",
         imageAssetPath: 'assets/images/d1_2.png',
       ),
       TI(
-        text: "영희는 부모님의 폰번호를 외우려고 합니다.(영희==효녀)\n   ▽\n0~9의 숫자를 이미지로 상상하는 연습을 해보겠습니다.",
+        text: "영희는 부모님의 폰번호를 외우려고 합니다.\n(영희==효녀)\n   ▽\n0~9의 숫자를 이미지로 상상하는 연습을 해보겠습니다.",
         imageAssetPath: 'assets/images/d1_0.png',
       ),
       TI(
@@ -20,7 +20,7 @@ class Day2 {
       TI(
         text: "저는 숫자 0을 보면 축구공을 떠올립니다.\n   ▽\n어제 하셨던 머리속으로 상상하기 잊지 않으셨겠죠??\n다음을 눌러 진행해 봅시다.",
         imageAssetPath: 'assets/images/d1_5.png',
-      ),
+      ).withSound('random'),
       TI(
         text: "숫자0을 자신만의 축구공으로 바꿔봅시다.$w",
         imageAssetPath: 'assets/images/d1_4.png',
@@ -31,17 +31,16 @@ class Day2 {
         imageAssetPath: 'assets/images/d1_5.png',
       ),
       TI(
-        text: "3분만 집중해주세요.\n   ▽\n나머지 숫자(1~9)도 이미지로 바꿔볼까요.\n   ▽\n각 숫자와 닮은 이미지를 떠올리시면 됩니다. 고고고",
+        text: "3분만 집중해주세요.\n   ▽\n나머지 숫자도 이미지로 바꿔볼까요.\n   ▽\n다음페이지 숫자 1부터 시작합니다!!",
         imageAssetPath: 'assets/images/d1_9.png',
       ),
       TI(
-        text: "숫자1을 바꿔 봅시다.\n   ▽\n이번 올림픽에서 멋지게 활약했던 박상영 선수네요.\n   ▽\n검이 1과 비슷하게 생겼네요.$w",
-        imageAssetPath: 'assets/images/d1_10_2.png',
-
+        text: "",
+        imageAssetPath: 'assets/images/d1_10_1.jpg',
       ).withAlarm(15),
       TI(
-        text: "1은 검입니다.\n   ▽\n찔리면 엄청 아프겠어요.",
-        imageAssetPath: 'assets/images/d1_10_1.png',
+        text: "",
+        imageAssetPath: 'assets/images/d1_10_2.png',
       ),
       TI(
         text: "숫자2를 바꿔 봅시다.\n   ▽\n호수위의 백조, 숫자 2와 닮았나요?$w",
