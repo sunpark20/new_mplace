@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "*"
+    ],
+    "dontAsk": true,
+    "allowedPrompts": [
+      {
+        "tool": "Bash",
+        "prompt": "*"
+      },
+      {
+        "tool": "Read",
+        "prompt": "*"
+      },
+      {
+        "tool": "Write",
+        "prompt": "*"
+      },
+      {
+        "tool": "Edit",
+        "prompt": "*"
+      },
+      {
+        "tool": "Glob",
+        "prompt": "*"
+      },
+      {
+        "tool": "Grep",
+        "prompt": "*"
+      }
+    ]
+  },
+  "model": "sonnet"
+}
