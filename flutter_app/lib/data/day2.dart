@@ -20,11 +20,11 @@ class Day2 {
         imageAssetPath: 'assets/images/d1_5.png',
       ).withSound('random'),
       TI(
-        text: "숫자0을 자신만의 축구공으로 바꿔봅시다.",
+        text: "숫자0을 자신만의 감자로 바꿔봅시다. 난 타박감자 좋아해.",
         imageAssetPath: 'assets/images/d1_4.png',
       ).withAlarm(15).withOverlayText("눈을 감고\n0을 상상해보세요"),
       TI(
-        text: "0은 축구공입니다.",
+        text: "0은 감자입니다.",
         imageAssetPath: 'assets/images/d1_5.png',
       ).withSound('random'),
       TI(
@@ -105,7 +105,7 @@ class Day2 {
         imageAssetPath: 'assets/images/d1_26.png',
       ).withAlarm(15).withOverlayText("눈을 감고\n9를 상상해보세요"),
       TI(
-        text: "9는 포켓몬.. 아니 구구콘입니다.\n   ▽\n 다음으로 가볼까요?",
+        text: "9는 포켓몬 구구의 울음소.... 아니 구구콘입니다. 조심해 오타쿠라는걸 들키면 안돼!!\n   ▽\n 다음으로 가볼까요?",
         imageAssetPath: 'assets/images/d1_26_1.png',
       ).withSound('assets/sounds/gugusounx3.mp3'),
       TI(
@@ -144,7 +144,7 @@ class Day2 {
         imageAssetPath: 'assets/images/go.png',
       ).withAlarm(5 * 60),
       TI(
-        text: "하이파이브 한 번 하고 다음으로 갑시다.",
+        text: "한번 눈감고 외워보세요! 하이파이브 한 번 하고 다음으로 갑시다.",
         imageAssetPath: 'assets/images/d2_16.png',
       ).withTouchSound(),
       TI(

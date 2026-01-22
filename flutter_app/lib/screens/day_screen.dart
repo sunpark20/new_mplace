@@ -43,7 +43,9 @@ class _DayScreenState extends State<DayScreen> {
   bool _triggerFlashOnLoad = false;
   final List<_HitEffect> _hitEffects = [];
   final Random _random = Random();
-  
+
+  // 선택지 목적지 인덱스들 (이전/다음에서 건너뛸 페이지들)
+  late final Set<int> _choiceDestinations;
 
   static const List<String> _alarmSounds = [
     'assets/sounds/alarm/ArrangedTeamInvitation.wav',
@@ -226,7 +228,15 @@ class _DayScreenState extends State<DayScreen> {
   @override
   void initState() {
     super.initState();
-    super.initState();
+    // 모든 선택지의 목적지 인덱스 수집 (이전/다음에서 건너뛸 페이지들)
+    _choiceDestinations = <int>{};
+    for (final ti in widget.tiArray) {
+      if (ti.hasChoices) {
+        for (final choice in ti.choices!) {
+          _choiceDestinations.add(choice.targetIndex);
+        }
+      }
+    }
     _loadCurrentPage();
   }
 
@@ -383,6 +393,14 @@ class _DayScreenState extends State<DayScreen> {
       _audioPlayer.stop();
       setState(() {
         _currentPage++;
+        // 선택지 목적지 페이지는 건너뛰기
+        while (_currentPage < widget.tiArray.length &&
+            _choiceDestinations.contains(_currentPage)) {
+          _currentPage++;
+        }
+        if (_currentPage >= widget.tiArray.length) {
+          _currentPage = widget.tiArray.length - 1;
+        }
         _loadCurrentPage();
       });
     } else {
@@ -419,6 +437,11 @@ class _DayScreenState extends State<DayScreen> {
       _audioPlayer.stop();
       setState(() {
         _currentPage--;
+        // 선택지 목적지 페이지는 건너뛰기
+        while (_currentPage > 0 &&
+            _choiceDestinations.contains(_currentPage)) {
+          _currentPage--;
+        }
         _loadCurrentPage();
       });
     }

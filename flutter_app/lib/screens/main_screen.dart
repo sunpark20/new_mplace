@@ -11,8 +11,6 @@ import '../data/day5_fc.dart';
 import '../data/day6_pao.dart';
 import 'day_screen.dart';
 import 'num_sample_screen.dart';
-import 'num_prac_screen.dart';
-import 'video_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -30,56 +28,43 @@ class _MainScreenState extends State<MainScreen> {
         if (!didPop) SystemNavigator.pop();
       },
       child: Scaffold(
-        extendBodyBehindAppBar: true,
         appBar: AppBar(
           title: const Text('기억의 궁전', style: TextStyle(fontWeight: FontWeight.bold)),
           centerTitle: true,
-          elevation: 0,
-          backgroundColor: Colors.transparent,
         ),
-        body: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/main.png'),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildSectionHeader('학습 단계'),
-                  const SizedBox(height: 10),
-                  _buildGrid([
-                    _buildMenuButton(context, '인트로', 'Day 0', Icons.play_circle_outline, () => _nav(DayScreen(title: '인트로', tiArray: Day0.getTiArray()))),
-                    _buildMenuButton(context, '1일차', 'Day 1', Icons.looks_one, () => _nav(DayScreen(title: '1일차', tiArray: Day1.getTiArray()))),
-                    _buildMenuButton(context, '2일차', 'Day 2', Icons.looks_two, () => _nav(DayScreen(title: '2일차', tiArray: Day2.getTiArray()))),
-                    _buildMenuButton(context, '3일차', 'Day 3', Icons.looks_3, () => _nav(DayScreen(title: '3일차', tiArray: Day3.getTiArray()))),
-                    _buildMenuButton(context, '3일차(추가)', 'Day 3-2', Icons.add_circle_outline, () => _nav(DayScreen(title: '3일차 추가', tiArray: Day32.getTiArray()))),
-                    _buildMenuButton(context, '4일차', 'Day 4', Icons.looks_4, () => _nav(DayScreen(title: '4일차', tiArray: Day4.getTiArray()))),
-                  ]),
-                  
-                  const SizedBox(height: 24),
-                  _buildSectionHeader('연습 & 참고자료'),
-                  const SizedBox(height: 10),
-                  _buildGrid([
-                    _buildMenuButton(context, '변환표 가이드', '00-99', Icons.people, () => _nav(const NumSampleScreen()), color: Colors.blue),
-                    _buildMenuButton(context, '첫 번째 도전', 'Challenge', Icons.flag, () => _nav(DayScreen(title: '첫 번째 도전', tiArray: Day5FC.getTiArray())), color: Colors.orange),
-                    _buildMenuButton(context, 'PAO 시스템', 'Day 6', Icons.schema, () => _nav(DayScreen(title: 'PAO 시스템', tiArray: Day6PAO.getTiArray())), color: Colors.purple),
-                    _buildMenuButton(context, '암기 연습', 'Practice', Icons.quiz, () => _nav(const NumPracScreen()), color: Colors.green),
-                  ]),
-
-                  const SizedBox(height: 24),
-                  _buildSectionHeader('비디오'),
-                  const SizedBox(height: 10),
-                  _buildGrid([
-                     _buildMenuButton(context, 'TED 강연', '기억의 궁전', Icons.video_library, () => _nav(const VideoScreen()), color: Colors.red),
-                  ]),
-                  const SizedBox(height: 40),
-                ],
-              ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildButton('머리말', () => _nav(DayScreen(title: '머리말', tiArray: Day0.getTiArray()))),
+                const SizedBox(height: 12),
+                _buildButton('day1- 몸', () => _nav(DayScreen(title: 'day1- 몸', tiArray: Day1.getTiArray()))),
+                const SizedBox(height: 12),
+                _buildButton('day2- 상상하기', () => _nav(DayScreen(title: 'day2- 상상하기', tiArray: Day2.getTiArray()))),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(child: _buildButton('day3-장소', () => _nav(DayScreen(title: 'day3-장소', tiArray: Day3.getTiArray())))),
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildButton('궁전만들기Tip', () => _nav(DayScreen(title: '궁전만들기Tip', tiArray: Day32.getTiArray())))),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _buildButton('day4- 숫자', () => _nav(DayScreen(title: 'day4- 숫자', tiArray: Day4.getTiArray()))),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(child: _buildButton('day5- 질문', () => _nav(DayScreen(title: 'day5- 질문', tiArray: Day5FC.getTiArray())))),
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildButton('인물-숫자 샘플', () => _nav(const NumSampleScreen()))),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _buildButton('day6-숫자2', () => _nav(DayScreen(title: 'day6-숫자2', tiArray: Day6PAO.getTiArray()))),
+                const SizedBox(height: 40),
+              ],
             ),
           ),
         ),
@@ -91,91 +76,20 @@ class _MainScreenState extends State<MainScreen> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4.0),
+  Widget _buildButton(String title, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
       child: Text(
         title,
         style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w800,
-          color: Colors.black87, 
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGrid(List<Widget> children) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double itemWidth = (constraints.maxWidth - 12) / 2; // 12 is spacing
-        return Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: children.map((child) => SizedBox(
-            width: itemWidth,
-            child: child
-          )).toList(),
-        );
-      }
-    );
-  }
-
-  Widget _buildMenuButton(BuildContext context, String title, String subtitle, IconData icon, VoidCallback onPressed, {Color? color}) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: (color ?? Theme.of(context).primaryColor).withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  size: 28,
-                  color: color ?? Theme.of(context).primaryColor,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );

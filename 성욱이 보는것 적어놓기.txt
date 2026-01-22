@@ -1,1 +1,4 @@
 1. 그림의 가로 세로 비율의 마지노선은 xx이다.
+
+xcode 조작법
+Xcode에서 Clean Build Folder (단축키: Cmd + Shift + K)

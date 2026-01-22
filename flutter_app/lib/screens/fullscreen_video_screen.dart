@@ -108,15 +108,9 @@ class _FullscreenVideoScreenState extends State<FullscreenVideoScreen> {
                   ],
                 )
               : _isInitialized && _controller != null
-                  ? SizedBox.expand(
-                      child: FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          width: _controller!.value.size.width,
-                          height: _controller!.value.size.height,
-                          child: VideoPlayer(_controller!),
-                        ),
-                      ),
+                  ? AspectRatio(
+                      aspectRatio: _controller!.value.aspectRatio,
+                      child: VideoPlayer(_controller!),
                     )
                   : const CircularProgressIndicator(color: Colors.white),
         ),
