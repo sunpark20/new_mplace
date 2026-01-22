@@ -18,7 +18,7 @@ class Day1 {
         imageAssetPath: 'assets/images/d2_3.png',
       ),
       TI(
-        text: "다음 페이지부터 지시를 따르시면 됩니다.\n1.준비물이 뭔지 확인 한다.\n   ▽\n2.준비물과 결합할 자신의 신체부위를 확인한다.▽\n3.눈을 감고 준비물을 몸에 붙이는 상상을 한다.\n   ▽\n준비가 됐다면 다음을 눌러 시작해 봅시다!",
+        text: "다음 페이지부터 지시를 따르시면 됩니다.\n1.준비물이 뭔지 확인 한다.\n   ▽\n2.준비물과 결합할 자신의 신체부위를 확인한다.\n▽\n3.눈을 감고 준비물을 몸에 붙이는 상상을 한다.\n▽\n준비가 됐다면 다음을 눌러 시작해 봅시다!",
         animationFrames: [
           'assets/images/d1_3_1.png',
           'assets/images/d1_3_2.png',
@@ -89,7 +89,7 @@ class Day1 {
       TI(
         text: "1.8절 스케치북\n   ▽\n2.드로잉 재료\n   ▽\n3.자석\n   ▽\n4.아주 가는 철사\n   ▽\n5.탬버린\n   ▽\n6.등산용 양말"
             "\n   ▽\n7.점토\n   ▽\n8.마이크\n   ▽\n9.해바라기\n   ▽\n10.돋보기\n   ▽\n여러분들 덕분에 철수가 선생님께 칭찬을 받았다고 합니다. 짝짝",
-        imageAssetPath: 'assets/images/d1_30.png',
+        imageAssetPath: 'assets/images/d2_30.png',
       ),
       TI(
         text: "하이파이브 한 번 하고 다음으로 갑시다.",

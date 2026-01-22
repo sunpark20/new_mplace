@@ -15,21 +15,21 @@ class Day0 {
       ).asHtml(),
       TI(
         text: "프로 기억력 선수들과 '기억의궁전'을 배운 많은 사람들이 기억술의 힘을 증명하고 있습니다.\n" +
-            "학교에서 성적을 잘 받거나, 마트에서 살 물건외우기 등 생활에 도움이 되는 것부터 시작해서" +
+            "학교에서 성적을 잘 받거나, 마트에서 살 물건외우기 등 생활에 도움이 되는 것부터 시작해서 " +
             "옥스포드 사전의 6만개 단어의 뜻을 암기하고, <a href='https://www.guinnessworldrecords.com/world-records/most-pi-places-memorised'>7만자리의 원주율값을 순서대로 외우는</a> 괴물같은 능력을 보여주고 있습니다.",
         imageAssetPath: 'assets/images/d0_1.png',
       ).asHtml(),
       TI(
-        text: "특별한 사람들의 이야기 같나요?? 기억력대회를 취재하러 갔다가, 1년만에 미국기억력 챔피언이 된.  <span style='color: red; font-size: 23px;'>평범한</span 기자의 ted 강연입니다.\n   ▽\n나중에 보셔도 됩니다. 데이터조심!",
-      ).asYoutubeLink(),
+        text: "특별한 사람들의 이야기 같나요?? 기억력대회를 취재하러 갔다가, 1년만에 미국기억력 챔피언이 된.  <span style='color: red; font-size: 23px;'>평범한</span> 기자의 ted 강연입니다.\n▽\n나중에 보셔도 됩니다. 데이터조심!",
+      ).asHtml().asYoutubeLink(),
        TI(
-        text: "핸드폰으로 슥쑉 AI로 쇽쇽 하면 되는 세상에서 왜 기억법을 배워야할까요?? 뇌에 근접해가고 있는 AI이지만 아직은 인간의 뇌처럼 정보를 연결하고 기억을 빼쓰진 못합니다. 뇌의 가능성은 무한합니다. 장소를 자주 찾아야 하는 런던 택시기사의 뇌의 해마는 일반인 3배 정도로 큽니다. 또한 한 실험에서 일반인이 기억력대회 종목을 연습한 결과 뇌에 새로운 연결경로가 생겼다는 <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC5439266/'>논문</a>이 뇌의 가능성을 뒷바침해줍니다.",
-        imageAssetPath: 'assets/images/d4_1.png',
+        text: "슈퍼컴퓨터가 세상을 바꿨나요? 언젠가 AI는 인간을 초월하겠죠. 하지만 지금 자신의 뇌 속에 슈퍼컴퓨터급 지식을 담고 세상을 바꾸는 남자가 있습니다. 바로 일론 머스크입니다.",
+        imageAssetPath: 'assets/images/d0_4.png',
       ).asHtml(),
       TI(
-        text: "천재?특별한능력??? 아닙니다. 본격적으로 기억의 궁전을 만들어봅시다. 레츠고!",
-        imageAssetPath: 'assets/images/d0_4.png',
-      ),
+        text: "천재?특별한능력??? 아닙니다. 기억의 궁전을 만들러 가봅시다. 레츠고!",
+        imageAssetPath: 'assets/images/d32_7.png',
+      ).withTouchSound(),
     ];
   }
 }
