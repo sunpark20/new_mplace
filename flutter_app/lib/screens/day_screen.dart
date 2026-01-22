@@ -1,4 +1,5 @@
 import 'video_screen.dart';
+import 'fullscreen_video_screen.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -314,8 +315,11 @@ class _DayScreenState extends State<DayScreen> {
             _timerCompleted = true;
             timer.cancel();
             if (_currentPage < widget.tiArray.length - 1) {
-              final randomSound = _alarmSounds[_random.nextInt(_alarmSounds.length)];
-              _playSound(randomSound);
+              final nextTi = widget.tiArray[_currentPage + 1];
+              if (!nextTi.hasSound) {
+                final randomSound = _alarmSounds[_random.nextInt(_alarmSounds.length)];
+                _playSound(randomSound);
+              }
               _triggerFlashOnLoad = true;
               _nextPage();
             } else {
@@ -336,6 +340,37 @@ class _DayScreenState extends State<DayScreen> {
         });
       }
     });
+  }
+
+  /// 선택지 선택 처리 - 동영상이 있으면 먼저 재생
+  void _handleChoiceSelection(Choice choice) async {
+    if (choice.videoPath != null) {
+      // 동영상 재생 후 해당 인덱스로 이동
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FullscreenVideoScreen(videoPath: choice.videoPath!),
+        ),
+      );
+      _jumpToIndex(choice.targetIndex);
+    } else {
+      _jumpToIndex(choice.targetIndex);
+    }
+  }
+
+  /// 선택지에서 특정 인덱스로 점프
+  void _jumpToIndex(int targetIndex) {
+    if (targetIndex >= 0 && targetIndex < widget.tiArray.length) {
+      _flashTimer?.cancel();
+      _countdownTimer?.cancel();
+      _animationTimer?.cancel();
+      _audioPlayer.stop();
+      _showPreviousPagePreview = false;
+      setState(() {
+        _currentPage = targetIndex;
+        _loadCurrentPage();
+      });
+    }
   }
 
   void _nextPage() {
@@ -535,7 +570,7 @@ class _DayScreenState extends State<DayScreen> {
                                 }
                                 return const SizedBox.shrink();
                               }),
-                            if (ti.hasTimer && _remainingSeconds > 0) ...[
+                            if (ti.overlayText != null)
                               Positioned(
                                 top: 16,
                                 left: 16,
@@ -545,10 +580,10 @@ class _DayScreenState extends State<DayScreen> {
                                     color: Colors.black.withOpacity(0.5),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: const Text(
-                                    "눈을 감고\n상상해보세요",
+                                  child: Text(
+                                    ti.overlayText!,
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -556,6 +591,7 @@ class _DayScreenState extends State<DayScreen> {
                                   ),
                                 ),
                               ),
+                            if (ti.hasTimer && _remainingSeconds > 0)
                               Positioned(
                                 top: 16,
                                 right: 16,
@@ -575,7 +611,6 @@ class _DayScreenState extends State<DayScreen> {
                                   ),
                                 ),
                               ),
-                              ],
                             ],
                           ),
                         ),
@@ -643,7 +678,7 @@ class _DayScreenState extends State<DayScreen> {
                                 }
                                 return const SizedBox.shrink();
                               }),
-                            if (ti.hasTimer && _remainingSeconds > 0) ...[
+                            if (ti.overlayText != null)
                               Positioned(
                                 top: 16,
                                 left: 16,
@@ -653,10 +688,10 @@ class _DayScreenState extends State<DayScreen> {
                                     color: Colors.black.withOpacity(0.5),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: const Text(
-                                    "눈을 감고\n상상해보세요",
+                                  child: Text(
+                                    ti.overlayText!,
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -664,6 +699,7 @@ class _DayScreenState extends State<DayScreen> {
                                   ),
                                 ),
                               ),
+                            if (ti.hasTimer && _remainingSeconds > 0)
                               Positioned(
                                 top: 16,
                                 right: 16,
@@ -683,7 +719,6 @@ class _DayScreenState extends State<DayScreen> {
                                   ),
                                 ),
                               ),
-                            ],
                           ],
                         ),
                         if (ti.isHtml)
@@ -722,7 +757,34 @@ class _DayScreenState extends State<DayScreen> {
                               style: const TextStyle(fontSize: 18, height: 1.6),
                             ),
                           ),
-                        
+
+                        // 선택지 버튼 UI
+                        if (ti.hasChoices)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 24.0, left: 16.0, right: 16.0),
+                            child: Row(
+                              children: ti.choices!.map((choice) {
+                                return Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                    child: ElevatedButton(
+                                      onPressed: () => _handleChoiceSelection(choice),
+                                      style: ElevatedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(vertical: 16),
+                                        backgroundColor: Colors.blue.shade600,
+                                        foregroundColor: Colors.white,
+                                      ),
+                                      child: Text(
+                                        choice.label,
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+
                         if (ti.isYoutubeLink)
                           Padding(
                             padding: const EdgeInsets.only(top: 24.0, left: 16.0, right: 16.0),
@@ -871,8 +933,8 @@ class _DayScreenState extends State<DayScreen> {
                     style: const TextStyle(fontSize: 16),
                   ),
                   ElevatedButton(
-                    onPressed: _nextPage,
-                    child: const Text('다음 >'),
+                    onPressed: ti.hasChoices ? null : _nextPage,
+                    child: Text(ti.hasChoices ? '선택하세요' : '다음 >'),
                   ),
                 ],
               ),
