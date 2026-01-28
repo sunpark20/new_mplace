@@ -23,6 +23,10 @@ class TI {
   final bool hasTouchSound;
   final String? overlayText;
   final List<Choice>? choices;
+  final String? initialSound;
+  final int? repeatCount;
+  final bool showCounter;
+  final String? videoPath;
 
   TI({
     required this.text,
@@ -37,6 +41,10 @@ class TI {
     this.hasTouchSound = false,
     this.overlayText,
     this.choices,
+    this.initialSound,
+    this.repeatCount,
+    this.showCounter = false,
+    this.videoPath,
   });
 
   TI withAnimation(List<String> frames) {
@@ -53,6 +61,10 @@ class TI {
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
+      initialSound: initialSound,
+      repeatCount: repeatCount,
+      showCounter: showCounter,
+      videoPath: videoPath,
     );
   }
 
@@ -70,6 +82,10 @@ class TI {
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
+      initialSound: initialSound,
+      repeatCount: repeatCount,
+      showCounter: showCounter,
+      videoPath: videoPath,
     );
   }
 
@@ -87,6 +103,10 @@ class TI {
       hasTouchSound: true,
       overlayText: overlayText,
       choices: choices,
+      initialSound: initialSound,
+      repeatCount: repeatCount,
+      showCounter: showCounter,
+      videoPath: videoPath,
     );
   }
 
@@ -104,6 +124,10 @@ class TI {
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
+      initialSound: initialSound,
+      repeatCount: repeatCount,
+      showCounter: showCounter,
+      videoPath: videoPath,
     );
   }
 
@@ -121,6 +145,10 @@ class TI {
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
+      initialSound: initialSound,
+      repeatCount: repeatCount,
+      showCounter: showCounter,
+      videoPath: videoPath,
     );
   }
 
@@ -138,6 +166,10 @@ class TI {
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
+      initialSound: initialSound,
+      repeatCount: repeatCount,
+      showCounter: showCounter,
+      videoPath: videoPath,
     );
   }
 
@@ -155,6 +187,10 @@ class TI {
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
+      initialSound: initialSound,
+      repeatCount: repeatCount,
+      showCounter: showCounter,
+      videoPath: videoPath,
     );
   }
 
@@ -172,6 +208,10 @@ class TI {
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
+      initialSound: initialSound,
+      repeatCount: repeatCount,
+      showCounter: showCounter,
+      videoPath: videoPath,
     );
   }
 
@@ -181,6 +221,7 @@ class TI {
   bool get hasImage => imageAssetPath != null;
   bool get hasResultImage => resultImageAssetPath != null;
   bool get hasChoices => choices != null && choices!.isNotEmpty;
+  bool get hasVideo => videoPath != null;
 
   TI withOverlayText(String text) {
     return TI(
@@ -196,6 +237,10 @@ class TI {
       hasTouchSound: hasTouchSound,
       overlayText: text,
       choices: choices,
+      initialSound: initialSound,
+      repeatCount: repeatCount,
+      showCounter: showCounter,
+      videoPath: videoPath,
     );
   }
 
@@ -215,6 +260,56 @@ class TI {
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
+      initialSound: initialSound,
+      repeatCount: repeatCount,
+      showCounter: showCounter,
+      videoPath: videoPath,
+    );
+  }
+
+  /// 반복 재생 사운드 추가 - 초기 사운드와 반복 사운드를 설정
+  /// 사용 예: .withRepeatSound('assets/sounds/mobak.mp3', 'assets/sounds/danbak.mp3', 99)
+  TI withRepeatSound(String initial, String repeat, int count, {bool showCounter = true}) {
+    return TI(
+      text: text,
+      imageAssetPath: imageAssetPath,
+      animationFrames: animationFrames,
+      soundAssetPath: repeat,
+      alarmTimeInSeconds: alarmTimeInSeconds,
+      isHtml: isHtml,
+      isYoutubeLink: isYoutubeLink,
+      isTouchPage: isTouchPage,
+      resultImageAssetPath: resultImageAssetPath,
+      hasTouchSound: hasTouchSound,
+      overlayText: overlayText,
+      choices: choices,
+      initialSound: initial,
+      repeatCount: count,
+      showCounter: showCounter,
+      videoPath: videoPath,
+    );
+  }
+
+  /// 비디오 추가 - 페이지에 비디오를 추가하고 자동재생
+  /// 사용 예: .withVideo('assets/videos/gump.mp4')
+  TI withVideo(String video) {
+    return TI(
+      text: text,
+      imageAssetPath: imageAssetPath,
+      animationFrames: animationFrames,
+      soundAssetPath: soundAssetPath,
+      alarmTimeInSeconds: alarmTimeInSeconds,
+      isHtml: isHtml,
+      isYoutubeLink: isYoutubeLink,
+      isTouchPage: isTouchPage,
+      resultImageAssetPath: resultImageAssetPath,
+      hasTouchSound: hasTouchSound,
+      overlayText: overlayText,
+      choices: choices,
+      initialSound: initialSound,
+      repeatCount: repeatCount,
+      showCounter: showCounter,
+      videoPath: video,
     );
   }
 }

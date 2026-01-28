@@ -1,0 +1,43 @@
+1. 간단한 방법 - 명령어 체이닝                                                                                                               
+                                                                                                                                               
+  # 명령어 실행 후 성공하면 알람                                                                                                               
+  your-command && afplay /System/Library/Sounds/Sosumi.aiff                                                                                    
+                                                                                                                                               
+  # 예시                                                                                                                                       
+  flutter build ios && afplay /System/Library/Sounds/Sosumi.aiff                                                                               
+                                                                                                                                               
+  2. Claude Code Hooks 설정 (추천)                                                                                                             
+                                                                                                                                               
+  Claude Code 설정 파일 (~/.claude/config.json)에 hook 추가:                                                                                   
+                                                                                                                                               
+  {                                                                                                                                            
+    "hooks": {                                                                                                                                 
+      "onToolComplete": "afplay /System/Library/Sounds/Sosumi.aiff"                                                                            
+    }                                                                                                                                          
+  }                                                                                                                                            
+                                                                                                                                               
+  3. Bash 함수로 만들기                                                                                                                        
+                                                                                                                                               
+  ~/.zshrc 또는 ~/.bashrc에 추가:                                                                                                              
+                                                                                                                                               
+  # Claude 작업 완료 알람 함수                                                                                                                 
+  claude_notify() {                                                                                                                            
+    "$@"                                                                                                                                       
+    afplay /System/Library/Sounds/Sosumi.aiff                                                                                                  
+  }                                                                                                                                            
+                                                                                                                                               
+  # 사용법: claude_notify flutter build ios                                                                                                    
+                                                                                                                                               
+  4. 알람 종류 변경                                                                                                                            
+                                                                                                                                               
+  # 짧은 소리                                                                                                                                  
+  tput bel                                                                                                                                     
+                                                                                                                                               
+  # Sosumi (긴 소리)                                                                                                                           
+  afplay /System/Library/Sounds/Sosumi.aiff                                                                                                    
+                                                                                                                                               
+  # 음성 알림                                                                                                                                  
+  say "작업 완료"                                                                                                                              
+                                                                                                                                               
+  # 팝업 알림                                                                                                                                  
+  osascript -e 'display notification "완료!" with title "Claude" sound name "Sosumi"'

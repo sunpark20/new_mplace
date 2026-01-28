@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
 
 import '../models/ti.dart';
 
@@ -43,6 +44,14 @@ class _DayScreenState extends State<DayScreen> {
   bool _triggerFlashOnLoad = false;
   final List<_HitEffect> _hitEffects = [];
   final Random _random = Random();
+
+  int _currentRepeatCount = 0;
+  int _totalRepeatCount = 0;
+  final AudioPlayer _repeatAudioPlayer = AudioPlayer();
+  bool _isRepeatPlaying = false;
+
+  VideoPlayerController? _videoController;
+  bool _isVideoInitialized = false;
 
   // 선택지 목적지 인덱스들 (이전/다음에서 건너뛸 페이지들)
   late final Set<int> _choiceDestinations;
@@ -244,10 +253,20 @@ class _DayScreenState extends State<DayScreen> {
     _timerCompleted = false;
     _currentAnimationFrame = 0;
     _animationTimer?.cancel();
+    _currentRepeatCount = 0;
+    _isRepeatPlaying = false;
+    _disposeVideoController();
 
     final ti = widget.tiArray[_currentPage];
 
-    if (ti.hasSound) {
+    if (ti.hasVideo) {
+      _initializeVideo(ti.videoPath!);
+    }
+
+    if (ti.initialSound != null && ti.repeatCount != null) {
+      _totalRepeatCount = ti.repeatCount!;
+      _startRepeatSound(ti.initialSound!, ti.soundAssetPath!);
+    } else if (ti.hasSound) {
       _playSound(ti.soundAssetPath!);
     }
 
@@ -262,6 +281,31 @@ class _DayScreenState extends State<DayScreen> {
     if (_triggerFlashOnLoad) {
       _triggerFlashOnLoad = false;
       _runFlashEffect();
+    }
+  }
+
+  void _initializeVideo(String videoPath) async {
+    try {
+      final cleanPath = videoPath.replaceFirst('assets/', '');
+      _videoController = VideoPlayerController.asset('assets/$cleanPath');
+      await _videoController!.initialize();
+      await _videoController!.setLooping(false);
+      await _videoController!.play();
+      if (mounted) {
+        setState(() {
+          _isVideoInitialized = true;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error initializing video: $e');
+    }
+  }
+
+  void _disposeVideoController() {
+    if (_videoController != null) {
+      _videoController!.dispose();
+      _videoController = null;
+      _isVideoInitialized = false;
     }
   }
 
@@ -284,6 +328,108 @@ class _DayScreenState extends State<DayScreen> {
     } catch (e) {
       debugPrint('Error playing sound: $e');
     }
+  }
+
+  void _startRepeatSound(String initialPath, String repeatPath) async {
+    try {
+      // 초기 사운드 재생 (mobak)
+      final cleanInitialPath = initialPath.replaceFirst('assets/', '');
+      await _audioPlayer.stop();
+      await _audioPlayer.play(AssetSource(cleanInitialPath));
+
+      // 초기 사운드가 끝나면 반복 사운드 시작
+      _audioPlayer.onPlayerComplete.first.then((_) {
+        if (mounted && !_isRepeatPlaying) {
+          _playRepeatSound(repeatPath);
+        }
+      });
+    } catch (e) {
+      debugPrint('Error playing initial sound: $e');
+    }
+  }
+
+  void _playRepeatSound(String repeatPath) async {
+    if (_isRepeatPlaying || _currentRepeatCount >= _totalRepeatCount) return;
+
+    _isRepeatPlaying = true;
+
+    try {
+      final cleanRepeatPath = repeatPath.replaceFirst('assets/', '');
+      await _repeatAudioPlayer.stop();
+      await _repeatAudioPlayer.play(AssetSource(cleanRepeatPath));
+
+      await _repeatAudioPlayer.onPlayerComplete.first;
+
+      if (mounted) {
+        setState(() {
+          _currentRepeatCount++;
+        });
+
+        if (_currentRepeatCount < _totalRepeatCount) {
+          _isRepeatPlaying = false;
+          _playRepeatSound(repeatPath);
+        } else {
+          // 99번 완료 시 팝업 표시
+          _showCompletionDialog();
+        }
+      }
+    } catch (e) {
+      debugPrint('Error playing repeat sound: $e');
+      _isRepeatPlaying = false;
+    }
+  }
+
+  void _showCompletionDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            '🎉 대단합니다!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.orange,
+            ),
+          ),
+          content: const Text(
+            '박수를 99번 들은 당신은\n뭘 해도 할 사람이군요.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20,
+              height: 1.5,
+            ),
+          ),
+          actions: [
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Text(
+                  '확인',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _runFlashEffect() {
@@ -386,11 +532,13 @@ class _DayScreenState extends State<DayScreen> {
   void _nextPage() {
     _flashTimer?.cancel();
     _showPreviousPagePreview = false;
+    _isRepeatPlaying = false;
     // _triggerFlashOnLoad = false; // Keep it if set by timer
     if (_currentPage < widget.tiArray.length - 1) {
       _countdownTimer?.cancel();
       _animationTimer?.cancel();
       _audioPlayer.stop();
+      _repeatAudioPlayer.stop();
       setState(() {
         _currentPage++;
         // 선택지 목적지 페이지는 건너뛰기
@@ -431,10 +579,12 @@ class _DayScreenState extends State<DayScreen> {
     _flashTimer?.cancel();
     _showPreviousPagePreview = false;
     _triggerFlashOnLoad = false;
+    _isRepeatPlaying = false;
     if (_currentPage > 0) {
       _countdownTimer?.cancel();
       _animationTimer?.cancel();
       _audioPlayer.stop();
+      _repeatAudioPlayer.stop();
       setState(() {
         _currentPage--;
         // 선택지 목적지 페이지는 건너뛰기
@@ -514,6 +664,8 @@ class _DayScreenState extends State<DayScreen> {
     _countdownTimer?.cancel();
     _animationTimer?.cancel();
     _audioPlayer.dispose();
+    _repeatAudioPlayer.dispose();
+    _disposeVideoController();
     _exitWarningTimer?.cancel();
     for (var player in _combatPlayers) {
       player.dispose();
@@ -549,7 +701,15 @@ class _DayScreenState extends State<DayScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        if (ti.hasImage && (!ti.hasTimer || !_timerCompleted))
+                        if (ti.hasVideo && _isVideoInitialized)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: AspectRatio(
+                              aspectRatio: _videoController!.value.aspectRatio,
+                              child: VideoPlayer(_videoController!),
+                            ),
+                          ),
+                        if (ti.hasImage && (!ti.hasTimer || !_timerCompleted) && !ti.hasVideo)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16.0),
                             child: Stack(
@@ -629,6 +789,33 @@ class _DayScreenState extends State<DayScreen> {
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            if (ti.showCounter && ti.repeatCount != null && _currentRepeatCount > 0)
+                              Positioned(
+                                bottom: 16,
+                                right: 16,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withOpacity(0.9),
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    '$_currentRepeatCount',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 32,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -737,6 +924,33 @@ class _DayScreenState extends State<DayScreen> {
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            if (ti.showCounter && ti.repeatCount != null && _currentRepeatCount > 0)
+                              Positioned(
+                                bottom: 16,
+                                right: 16,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withOpacity(0.9),
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    '$_currentRepeatCount',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 32,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

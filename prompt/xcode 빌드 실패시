@@ -1,0 +1,6 @@
+  3. Flutter Clean 후 재빌드                   
+                                               
+  cd flutter_app                               
+  flutter clean                                
+  flutter pub get                              
+  flutter build ios --release   
