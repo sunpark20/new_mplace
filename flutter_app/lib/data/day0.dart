@@ -1,8 +1,8 @@
 import '../models/ti.dart';
-
+const String arrow ="\n   ▽\n";
+const String arrow_h = "<br>&nbsp;&nbsp;&nbsp;▽<br>";
 class Day0 {
-  const String arrow ="\n   ▽\n";
-  const String arrow_h = "<br>&nbsp;&nbsp;&nbsp;▽<br>";
+
   static List<TI> getTiArray() {
     return [
       TI(
@@ -15,8 +15,8 @@ class Day0 {
         imageAssetPath: 'assets/images/d0_2.png',
       ).asHtml(),
       TI(
-        text: "프로 기억력 선수라는게 있어요<br>   ▽<br>옥스포드 사전의 6만개 단어의 뜻을 암기하고, <a href='https://www.guinnessworldrecords.com/world-records/most-pi-places-memorised'>7만자리의 원주율값</a>을 순서대로 외운답니다."+
-            "<br>&nbsp;&nbsp;&nbsp;▽<br>서번트, 포토메모리가 아닌 평범한 우리도 기억의궁전으로 할 수 있어요!",
+        text: "프로 기억력 선수(??) 들어보셨나요.$arrow_h각 나라의 대표들은 옥스포드 사전의 6만개 단어의 뜻을 암기하고, <a href='https://www.guinnessworldrecords.com/world-records/most-pi-places-memorised'>7만자리의 원주율값</a>을 순서대로 외운답니다."+
+            "$arrow_h서번트, 포토메모리가 아닌 평범한 우리도 기억의궁전으로 할 수 있어요!",
         imageAssetPath: 'assets/images/d0_1.png',
       ).asHtml(),
       TI(

@@ -1,2 +1,8 @@
 git add . 
 git commit -m "커밋 메시지"
+처음 한 번:
+git push -u origin main
+(이제 로컬 main과 원격 main이 서로 연결됨)
+두 번째부터:
+git push
+(연결 정보를 기억하고 있으므로 생략 가능!)
