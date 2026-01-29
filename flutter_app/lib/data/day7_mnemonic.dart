@@ -1,16 +1,50 @@
 import '../models/ti.dart';
-
+const String arrow ="\n   ▽\n";
+const String arrow_h = "<br>&nbsp;&nbsp;&nbsp;▽<br>";
 class Day7Mnemonic {
   static List<TI> getTiArray() {
     return [
+      // 인덱스 0 
       TI(
-        text: "뇌모닉(Mnemonic) 기억법에 대해 알아봅시다.\n   ▽\n뇌모닉은 기억하기 어려운 정보를 쉽게 외우기 위한 기억술입니다.",
-        imageAssetPath: 'assets/images/d0_2.png',
-      ),
+        text: "핵전쟁이 일어났습니다. 가족과 함께 떠나야합니다. 어떤 방법으로 자금을 챙기시겠습니까?",
+        imageAssetPath: 'assets/images/b_a.jpg',
+      ).withAutoFullscreenVideo('assets/videos/nuclear.mp4').withChoices([
+        Choice("순금바", 1),
+        Choice("현금", 1),
+        Choice("모바일뱅킹 하면됨", 2),
+        Choice("이럴줄 알고 미국달러통장 만들어놓음", 2),
+      ]),
+      // 인덱스 1 
       TI(
-        text: "여기에 day7의 내용을 추가하세요.\n   ▽\n이 파일을 수정해서 원하는 내용을 채워넣으세요!",
-        imageAssetPath: 'assets/images/d0_3.png',
+        text: "순금바, 현금을 선택하셨습니다.\n   ▽\n응, 국경에서 다 압수$arrow다음으로 가서 해결책을 찾아봅시다.",
+        imageAssetPath: 'assets/images/b_1.jpg',
+      ).withSound('assets/sounds/b_1.mp3').withSound('assets/sounds/b_2.mp3'),
+      // 인덱스 2 
+      TI(
+        text: "모바일뱅킹(미국달러도 비축)을 선택하셨습니다.\n   ▽\n응, 한국 전산망 파괴, USA 해외거래소 자금동결$arrow다음으로 가서 해결책을 찾아봅시다.",
+        imageAssetPath: 'assets/images/b_2.jpg',
+      ).withSound('assets/sounds/trump.mp3'),
+      // 인덱스 3 
+      TI(
+        text: "이런.. 방법이 없을까요??\n   ▽\n혹시.. 돈을 기억의궁전에 숨길 수 있을까??",
+        imageAssetPath: 'assets/images/b_3.png',
       ),
+      // 인덱스 4 
+      TI(
+        text: "맞습니다. 단어 24자리를 순서대로 외우면 됩니다. 종이하나 없이 뇌에 비트코인을 저장할수 있습니다.$arrow핵전쟁이 일어나도 우리 가족들을 안전하게 지켜줄 자산은 단연코 비트코인입니다.",
+        imageAssetPath: 'assets/images/bitcoin.png',
+      ),
+      // 인덱스 5
+      TI(
+        text: "신뢰 하지말고 검증하라. 비트코인의 핵심 철학입니다.",
+        imageAssetPath: 'assets/images/b_5.webp',
+      ).asHtml(),
+      TI(
+        text: "다음책과 유튜브동영상으로 각자 검증해보세요. 기초적인 내용들로 준비했습니다.$arrow_h"+
+        "<br><a href='https://www.youtube.com/watch?v=bBC-nXj3Ng4'>비트코인 설명영상</a><br><br>"+
+        "'구구' 찾아라. 비밀의문 열린다.",
+        imageAssetPath: 'assets/images/b_6.webp',
+      ).asHtml(),
     ];
   }
 }

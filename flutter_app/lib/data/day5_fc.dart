@@ -1,6 +1,8 @@
 import '../models/ti.dart';
-
+const String arrow ="\n   ▽\n";
+const String arrow_h = "<br>&nbsp;&nbsp;&nbsp;▽<br>";
 class Day5FC {
+  
   static List<TI> getTiArray() {
     return [
       TI(
@@ -49,7 +51,17 @@ class Day5FC {
         text: "꾸준히 기억의 궁전을 하시다 보면 자신만의 비법이 생길거에요. \"이렇게 하니까 잘 안외워지네. 아 이런건 잘 외워지네~\"\n"
             "제가 가르쳐주는 팁들이 잘 맞으면 참고하시고 아니라면 버리면 됩니다.",
         imageAssetPath: 'assets/images/d2_16.png',
-      ).withTouchSound(),
+      ).withTouchSound().withCrackTransform(
+        cracks: ['assets/images/crack1.png', 'assets/images/crack2.png'],
+        thresholds: [33, 66],
+        transformAt: 99,
+        transformTo: 'assets/images/citadel.webp',
+        sound: 'assets/sounds/ClanInvitation.wav',
+        effect: TransformEffect.fadeIn,
+        popupTitle: '히든조건 달성',
+        popupButtonText: '시타델 가입링크',
+        popupLink: 'https://discord.com/invite/gfWYEFkDPd',
+      ),
       TI(
         text: "0~99까지 숫자를 자음화->인물로 변환(day4)해서 기억의 궁전으로 외우시면 됩니다."
             "(0~9, 00~99)\n"
@@ -65,9 +77,10 @@ class Day5FC {
       ),
       TI(
         text: "100개가 넘는 기억의 궁전을 만들고 저것들을 외우고 나면, 숫자 외우기는 식은 죽 먹기가 될 것입니다. 또한 기억의 궁전 기본기가 탄탄해지게 될 것입니다."
-            "화이팅!! 자 그럼 오늘부터 차근차근 자신만의 인물을 만들어 보는겁니다.\n제가 사용하는 인물-숫자 샘플 day5 오른쪽에 있습니다. 참고하세요.",
+            "화이팅!! 자 그럼 오늘부터 차근차근 자신만의 인물을 만들어 보는겁니다.\n제가 사용하는 인물-숫자 샘플 day5 오른쪽에 있습니다. 참고$arrow_h"+
+            "<span style='color: red; font-size: 23px;'>100개의 기억의궁전을 확보하고, 0~99 숫자를 자신만의 캐릭터로 외우세요. 이 100개의 방은 숫자외우기의 탄탄한 기초가 될것입니다.</span> ",
         imageAssetPath: 'assets/images/d5_8.png',
-      ),
+      ).asHtml(),
     ];
   }
 }

@@ -6,7 +6,7 @@ class Day1 {
     return [
       TI(
         text: "신체를 이용한 이용한 기억법을 배워봅시다. 방법은 간단합니다.\"\n   ▽\n눈을 감고 머리속으로 상상만 하면 됩니다. 고고!",
-        imageAssetPath: 'assets/images/d2_1.png',
+        imageAssetPath: 'assets/images/d1_da.webp',
       ),
       TI(
         text: "철수: \"내일은 첫 등교하는 날.\n준비물을 확실히 챙겨야해!!\"\n   ▽\n우리 함께 철수를 위해서 학교 준비물을 외워 봅시다.",
@@ -89,11 +89,26 @@ class Day1 {
         text: "1.8절 스케치북\n   ▽\n2.드로잉 재료\n   ▽\n3.자석\n   ▽\n4.아주 가는 철사\n   ▽\n5.탬버린\n   ▽\n6.등산용 양말"
             "\n   ▽\n7.점토\n   ▽\n8.마이크\n   ▽\n9.해바라기\n   ▽\n10.돋보기\n   ▽\n여러분들 덕분에 철수가 선생님께 칭찬을 받았다고 합니다. 짝짝",
         imageAssetPath: 'assets/images/d2_30.png',
-      ).withRepeatSound('assets/sounds/mobak.mp3', 'assets/sounds/danbak.mp3', 99),
+      ).withRepeatSound('assets/sounds/mobak.mp3', 'assets/sounds/danbak.mp3', 99,
+        completionSound: 'assets/sounds/ClanInvitation.wav',
+        popupTitle: '히든조건 달성',
+        popupButtonText: '시타델 가입링크',
+        popupLink: 'https://discord.com/invite/gfWYEFkDPd',
+      ),
       TI(
         text: "하이파이브 한 번 하고 다음으로 갑시다.",
         imageAssetPath: 'assets/images/d2_16.png',
-      ).withTouchSound(),
+      ).withTouchSound().withCrackTransform(
+        cracks: ['assets/images/crack1.png', 'assets/images/crack2.png'],
+        thresholds: [33, 66],
+        transformAt: 99,
+        transformTo: 'assets/images/citadel.webp',
+        sound: 'assets/sounds/ClanInvitation.wav',
+        effect: TransformEffect.fadeIn,
+        popupTitle: '히든조건 달성',
+        popupButtonText: '시타델 가입링크',
+        popupLink: 'https://discord.com/invite/gfWYEFkDPd',
+      ),
       TI(
         text: "오감은 기억력의 일등공신입니다. 코찌르기, 양말냄새 상상하기!! 진짜 해보셨죠??\n혹시 다 못마추셨어도 실망하지 마세요.\n우리는 준비물의 순서까지도 외우고 있습니다! 다음 단계에서 만나요!",
         imageAssetPath: 'assets/images/d0_3.png',

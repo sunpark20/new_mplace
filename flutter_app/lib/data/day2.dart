@@ -106,7 +106,7 @@ class Day2 {
       ).withAlarm(15).withOverlayText("눈을 감고\n9를 상상해보세요"),
       TI(
         text: "9는 포켓몬 구구의 울음소.... 아니 구구콘입니다. 조심해 오타쿠라는걸 들키면 안돼!!\n   ▽\n 다음으로 가볼까요?",
-        imageAssetPath: 'assets/images/d1_26_1.png',
+        imageAssetPath: 'assets/images/d1_26_1.webp',
       ).withSound('assets/sounds/gugusounx3.mp3'),
       TI(
         text: "<미션> 0~9를 이미지로 변환하자.\n폰을 놓고, 눈을 감은 후, 0~9까지 숫자를 변환된 이미지로 떠올려본다.\n   ▽\n혹시 잘 떠오르지 않으면 다시 복습하시고 오세요.\n   ▽\n다 떠올렸다면 다음으로 고고!!",
@@ -146,7 +146,17 @@ class Day2 {
       TI(
         text: "한번 눈감고 외워보세요! 하이파이브 한 번 하고 다음으로 갑시다.",
         imageAssetPath: 'assets/images/d2_16.png',
-      ).withTouchSound(),
+      ).withTouchSound().withCrackTransform(
+        cracks: ['assets/images/crack1.png', 'assets/images/crack2.png'],
+        thresholds: [33, 66],
+        transformAt: 99,
+        transformTo: 'assets/images/citadel.webp',
+        sound: 'assets/sounds/ClanInvitation.wav',
+        effect: TransformEffect.fadeIn,
+        popupTitle: '히든조건 달성',
+        popupButtonText: '시타델 가입링크',
+        popupLink: 'https://discord.com/invite/gfWYEFkDPd',
+      ),
       TI(
         text: "맞추셨다면 아주 잘 하셨습니다.\n   ▽\n다 기억나지 않더라도 괜찮습니다.\n   ▽\n사실 이 방법은 조금 어렵습니다.\n   ▽\n다음 시간에는 그 한계를 뛰어 넘을 수 있는 기억법 드디어 기억을 궁전을 배워봅시다.",
         imageAssetPath: 'assets/images/d0_3.png',

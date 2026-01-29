@@ -42,7 +42,17 @@ class Day4 {
       TI(
         text: "이제 준비가 끝났습니다. 기억의궁전과 함께 숫자를 외워볼까요. 다음으로 고고!",
         imageAssetPath: 'assets/images/d2_16.png',
-      ).withTouchSound(),
+      ).withTouchSound().withCrackTransform(
+        cracks: ['assets/images/crack1.png', 'assets/images/crack2.png'],
+        thresholds: [33, 66],
+        transformAt: 99,
+        transformTo: 'assets/images/citadel.webp',
+        sound: 'assets/sounds/ClanInvitation.wav',
+        effect: TransformEffect.fadeIn,
+        popupTitle: '히든조건 달성',
+        popupButtonText: '시타델 가입링크',
+        popupLink: 'https://discord.com/invite/gfWYEFkDPd',
+      ),
       TI(
         text: "<미션> 8분 동안 위의 숫자를 외우자.\n먼저 10개짜리 방으로 이루어진 기억의궁전이 필요하겠네요. day3에서 아카데미 수상작 외웠던걸 떠올려보세요!"
             "다 외우셨다면 다음으로 갑시다.",

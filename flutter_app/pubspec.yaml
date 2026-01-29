@@ -46,6 +46,13 @@ dependencies:
   # UI utilities
   flutter_html: ^3.0.0-beta.2
   url_launcher: ^6.3.1
+  flutter_svg: ^2.0.10
+
+  # Async utilities
+  async: ^2.11.0
+
+  # HTTP client
+  http: ^1.2.0
 
 dev_dependencies:
   flutter_test:

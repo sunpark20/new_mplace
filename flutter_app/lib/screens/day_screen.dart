@@ -2,6 +2,7 @@ import 'video_screen.dart';
 import 'fullscreen_video_screen.dart';
 import 'dart:async';
 import 'dart:math';
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -24,7 +25,7 @@ class DayScreen extends StatefulWidget {
   State<DayScreen> createState() => _DayScreenState();
 }
 
-class _DayScreenState extends State<DayScreen> {
+class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
   int _currentPage = 0;
   Timer? _countdownTimer;
   Timer? _animationTimer;
@@ -49,9 +50,23 @@ class _DayScreenState extends State<DayScreen> {
   int _totalRepeatCount = 0;
   final AudioPlayer _repeatAudioPlayer = AudioPlayer();
   bool _isRepeatPlaying = false;
+  CancelableOperation<void>? _repeatSoundOperation;
+  StreamSubscription<void>? _repeatCompleteSubscription;
+  String? _currentRepeatPath;
 
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
+  final AudioPlayer _backgroundMusicPlayer = AudioPlayer();
+
+  // Crack Transform 관련 변수
+  int _crackTouchCounter = 0;
+  List<bool> _visibleCracks = [];
+  bool _isTransformed = false;
+  AnimationController? _transformAnimController;
+  Animation<double>? _transformAnimation;
+  Animation<Offset>? _slideAnimation;
+  Animation<double>? _scaleAnimation;
+  Animation<double>? _rotateAnimation;
 
   // 선택지 목적지 인덱스들 (이전/다음에서 건너뛸 페이지들)
   late final Set<int> _choiceDestinations;
@@ -255,12 +270,37 @@ class _DayScreenState extends State<DayScreen> {
     _animationTimer?.cancel();
     _currentRepeatCount = 0;
     _isRepeatPlaying = false;
+    _repeatSoundOperation?.cancel();
+    _repeatSoundOperation = null;
+    _repeatCompleteSubscription?.cancel();
+    _repeatCompleteSubscription = null;
+    _currentRepeatPath = null;
+    _repeatAudioPlayer.stop();
     _disposeVideoController();
 
     final ti = widget.tiArray[_currentPage];
 
+    // 자동 풀스크린 비디오 재생
+    if (ti.hasAutoFullscreenVideo) {
+      _playAutoFullscreenVideo(ti.autoFullscreenVideo!);
+    }
+
     if (ti.hasVideo) {
       _initializeVideo(ti.videoPath!);
+    }
+
+    // Crack Transform 초기화
+    if (ti.hasCrackTransform) {
+      _crackTouchCounter = 0;
+      _visibleCracks = List.filled(ti.crackImages!.length, false);
+      _isTransformed = false;
+      _initTransformAnimation(ti.transformEffect ?? TransformEffect.fadeIn);
+    }
+
+    // 백그라운드 음악
+    _backgroundMusicPlayer.stop();
+    if (ti.hasBackgroundMusic) {
+      _playBackgroundMusic(ti.backgroundMusic!);
     }
 
     if (ti.initialSound != null && ti.repeatCount != null) {
@@ -281,6 +321,151 @@ class _DayScreenState extends State<DayScreen> {
     if (_triggerFlashOnLoad) {
       _triggerFlashOnLoad = false;
       _runFlashEffect();
+    }
+  }
+
+  Widget _buildTransformedImage(TI ti) {
+    final effect = ti.transformEffect ?? TransformEffect.fadeIn;
+
+    Widget image = Image.asset(
+      ti.transformedImage!,
+      width: double.infinity,
+      fit: BoxFit.fitWidth,
+      errorBuilder: (context, error, stackTrace) {
+        debugPrint('Error loading transformed image ${ti.transformedImage}: $error');
+        return Container(
+          height: 200,
+          color: Colors.grey[300],
+          child: const Center(
+            child: Icon(Icons.image_not_supported, size: 64),
+          ),
+        );
+      },
+    );
+
+    if (_transformAnimController == null) return image;
+
+    return AnimatedBuilder(
+      animation: _transformAnimController!,
+      builder: (context, child) {
+        switch (effect) {
+          case TransformEffect.fadeIn:
+            return Opacity(
+              opacity: _transformAnimation?.value ?? 1.0,
+              child: child,
+            );
+          case TransformEffect.slideLeft:
+          case TransformEffect.slideRight:
+          case TransformEffect.slideUp:
+          case TransformEffect.slideDown:
+            return SlideTransition(
+              position: _slideAnimation ?? AlwaysStoppedAnimation(Offset.zero),
+              child: child,
+            );
+          case TransformEffect.scale:
+            return Transform.scale(
+              scale: _scaleAnimation?.value ?? 1.0,
+              child: child,
+            );
+          case TransformEffect.rotate:
+            return Transform.rotate(
+              angle: (_rotateAnimation?.value ?? 0.0) * pi,
+              child: Opacity(
+                opacity: _transformAnimation?.value ?? 1.0,
+                child: child,
+              ),
+            );
+          case TransformEffect.flip:
+            return Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.001)
+                ..rotateY((_rotateAnimation?.value ?? 0.0) * pi),
+              child: child,
+            );
+          case TransformEffect.zoomBlur:
+            return Transform.scale(
+              scale: _scaleAnimation?.value ?? 1.0,
+              child: Opacity(
+                opacity: _transformAnimation?.value ?? 1.0,
+                child: child,
+              ),
+            );
+          case TransformEffect.dissolve:
+            return Opacity(
+              opacity: _transformAnimation?.value ?? 1.0,
+              child: child,
+            );
+        }
+      },
+      child: image,
+    );
+  }
+
+  void _initTransformAnimation(TransformEffect effect) {
+    _transformAnimController?.dispose();
+    _transformAnimController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    switch (effect) {
+      case TransformEffect.fadeIn:
+        _transformAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.easeInOut),
+        );
+        break;
+      case TransformEffect.slideLeft:
+        _slideAnimation = Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.easeOutCubic),
+        );
+        break;
+      case TransformEffect.slideRight:
+        _slideAnimation = Tween<Offset>(begin: const Offset(-1.0, 0.0), end: Offset.zero).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.easeOutCubic),
+        );
+        break;
+      case TransformEffect.slideUp:
+        _slideAnimation = Tween<Offset>(begin: const Offset(0.0, 1.0), end: Offset.zero).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.easeOutCubic),
+        );
+        break;
+      case TransformEffect.slideDown:
+        _slideAnimation = Tween<Offset>(begin: const Offset(0.0, -1.0), end: Offset.zero).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.easeOutCubic),
+        );
+        break;
+      case TransformEffect.scale:
+        _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.elasticOut),
+        );
+        break;
+      case TransformEffect.rotate:
+        _rotateAnimation = Tween<double>(begin: -1.0, end: 0.0).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.easeOutBack),
+        );
+        _transformAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.easeInOut),
+        );
+        break;
+      case TransformEffect.flip:
+        _rotateAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.easeInOut),
+        );
+        break;
+      case TransformEffect.zoomBlur:
+        _scaleAnimation = Tween<double>(begin: 1.5, end: 1.0).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.easeOut),
+        );
+        _transformAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.easeIn),
+        );
+        break;
+      case TransformEffect.dissolve:
+        _transformAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(parent: _transformAnimController!, curve: Curves.easeInOutSine),
+        );
+        break;
     }
   }
 
@@ -309,6 +494,24 @@ class _DayScreenState extends State<DayScreen> {
     }
   }
 
+  /// 페이지 로드 시 자동으로 풀스크린 비디오 재생
+  void _playAutoFullscreenVideo(String videoPath) async {
+    // 약간의 딜레이 후 비디오 화면으로 이동 (UI가 먼저 빌드되도록)
+    await Future.delayed(const Duration(milliseconds: 100));
+    if (mounted) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FullscreenVideoScreen(videoPath: videoPath),
+        ),
+      );
+      // 비디오 완료 후 돌아오면 setState로 UI 갱신
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
   void _playSound(String path) async {
     try {
       String actualPath = path;
@@ -330,15 +533,33 @@ class _DayScreenState extends State<DayScreen> {
     }
   }
 
+  void _playBackgroundMusic(String path) async {
+    try {
+      final cleanPath = path.replaceFirst('assets/', '');
+      await _backgroundMusicPlayer.setReleaseMode(ReleaseMode.loop);
+      await _backgroundMusicPlayer.play(AssetSource(cleanPath));
+    } catch (e) {
+      debugPrint('Error playing background music: $e');
+    }
+  }
+
   void _startRepeatSound(String initialPath, String repeatPath) async {
     try {
+      // 기존 operation 취소
+      _repeatSoundOperation?.cancel();
+
       // 초기 사운드 재생 (mobak)
       final cleanInitialPath = initialPath.replaceFirst('assets/', '');
       await _audioPlayer.stop();
       await _audioPlayer.play(AssetSource(cleanInitialPath));
 
-      // 초기 사운드가 끝나면 반복 사운드 시작
-      _audioPlayer.onPlayerComplete.first.then((_) {
+      // 초기 사운드가 끝나면 반복 사운드 시작 (취소 가능하도록)
+      _repeatSoundOperation = CancelableOperation.fromFuture(
+        _audioPlayer.onPlayerComplete.first,
+        onCancel: () => debugPrint('Repeat sound operation cancelled'),
+      );
+
+      _repeatSoundOperation!.value.then((_) {
         if (mounted && !_isRepeatPlaying) {
           _playRepeatSound(repeatPath);
         }
@@ -349,81 +570,213 @@ class _DayScreenState extends State<DayScreen> {
   }
 
   void _playRepeatSound(String repeatPath) async {
-    if (_isRepeatPlaying || _currentRepeatCount >= _totalRepeatCount) return;
+    if (_currentRepeatCount >= _totalRepeatCount) return;
 
-    _isRepeatPlaying = true;
+    _currentRepeatPath = repeatPath;
 
+    // 기존 subscription 정리
+    _repeatCompleteSubscription?.cancel();
+
+    // 완료 이벤트 리스너 설정
+    _repeatCompleteSubscription = _repeatAudioPlayer.onPlayerComplete.listen((_) {
+      if (!mounted) return;
+
+      setState(() {
+        _currentRepeatCount++;
+      });
+
+      if (_currentRepeatCount < _totalRepeatCount) {
+        // 다음 반복 재생
+        _playSingleRepeat(repeatPath);
+      } else {
+        // 완료 시 팝업 표시
+        _repeatCompleteSubscription?.cancel();
+        _repeatCompleteSubscription = null;
+        final ti = widget.tiArray[_currentPage];
+        if (ti.repeatCompletionSound != null) {
+          _playSound(ti.repeatCompletionSound!);
+        }
+        _showCompletionDialog(ti);
+      }
+    });
+
+    // 첫 번째 재생 시작
+    _playSingleRepeat(repeatPath);
+  }
+
+  void _playSingleRepeat(String repeatPath) async {
     try {
       final cleanRepeatPath = repeatPath.replaceFirst('assets/', '');
       await _repeatAudioPlayer.stop();
       await _repeatAudioPlayer.play(AssetSource(cleanRepeatPath));
-
-      await _repeatAudioPlayer.onPlayerComplete.first;
-
-      if (mounted) {
-        setState(() {
-          _currentRepeatCount++;
-        });
-
-        if (_currentRepeatCount < _totalRepeatCount) {
-          _isRepeatPlaying = false;
-          _playRepeatSound(repeatPath);
-        } else {
-          // 99번 완료 시 팝업 표시
-          _showCompletionDialog();
-        }
-      }
     } catch (e) {
       debugPrint('Error playing repeat sound: $e');
-      _isRepeatPlaying = false;
     }
   }
 
-  void _showCompletionDialog() {
+  void _showCompletionDialog(TI ti) {
+    // 커스텀 팝업이 설정된 경우
+    if (ti.repeatPopupLink != null && ti.repeatPopupButtonText != null) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Text(
+              ti.repeatPopupTitle ?? '축하합니다!',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            ),
+            actions: [
+              Center(
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        final uri = Uri.parse(ti.repeatPopupLink!);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        ti.repeatPopupButtonText!,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('닫기', style: TextStyle(color: Colors.grey)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // 기본 팝업
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: const Text(
+              '🎉 대단합니다!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange,
+              ),
+            ),
+            content: const Text(
+              '박수를 99번 들은 당신은\n뭘 해도 할 사람이군요.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                height: 1.5,
+              ),
+            ),
+            actions: [
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text(
+                    '확인',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _showTransformPopup(TI ti) {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Text(
-            '🎉 대단합니다!',
+          title: Text(
+            ti.transformPopupTitle ?? '축하합니다!',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 28,
+            style: const TextStyle(
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.orange,
-            ),
-          ),
-          content: const Text(
-            '박수를 99번 들은 당신은\n뭘 해도 할 사람이군요.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
-              height: 1.5,
+              color: Colors.deepPurple,
             ),
           ),
           actions: [
             Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+              child: Column(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      final uri = Uri.parse(ti.transformPopupLink!);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: Text(
+                      ti.transformPopupButtonText!,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  '확인',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('닫기', style: TextStyle(color: Colors.grey)),
+                  ),
+                ],
               ),
             ),
           ],
@@ -496,6 +849,44 @@ class _DayScreenState extends State<DayScreen> {
         });
       }
     });
+  }
+
+  /// 선택지 버튼 위젯 생성
+  Widget _buildChoiceButton(Choice choice) {
+    return GestureDetector(
+      onTapDown: _onChoiceTapDown,
+      onTapUp: (_) => _onChoiceTapUp(choice),
+      onTapCancel: () => _audioPlayer.stop(),
+      child: AbsorbPointer(
+        child: ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            backgroundColor: Colors.blue.shade600,
+            foregroundColor: Colors.white,
+          ),
+          child: Text(
+            choice.label,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 선택지 버튼 누름 시작 - mouseclick1 재생
+  void _onChoiceTapDown(TapDownDetails details) {
+    _audioPlayer.stop();
+    _audioPlayer.play(AssetSource('sounds/MouseClick1.wav'));
+  }
+
+  /// 선택지 버튼 뗌 - mouseclick2 재생 후 선택 처리
+  void _onChoiceTapUp(Choice choice) async {
+    await _audioPlayer.stop();
+    await _audioPlayer.play(AssetSource('sounds/MouseClick2.wav'));
+    // mouseclick2 재생을 위해 잠시 대기
+    await Future.delayed(const Duration(milliseconds: 150));
+    _handleChoiceSelection(choice);
   }
 
   /// 선택지 선택 처리 - 동영상이 있으면 먼저 재생
@@ -604,6 +995,44 @@ class _DayScreenState extends State<DayScreen> {
   }
 
   void _handleHighFiveTouch(Offset position) async {
+    final ti = widget.tiArray[_currentPage];
+
+    // Crack Transform 로직
+    if (ti.hasCrackTransform && !_isTransformed) {
+      _crackTouchCounter++;
+
+      // 각 임계값에서 crack 표시
+      for (int i = 0; i < ti.crackThresholds!.length; i++) {
+        if (_crackTouchCounter >= ti.crackThresholds![i] && !_visibleCracks[i]) {
+          setState(() {
+            _visibleCracks[i] = true;
+          });
+        }
+      }
+
+      // 변환 임계값 도달
+      if (_crackTouchCounter >= ti.transformThreshold!) {
+        // 변환 소리 재생
+        if (ti.transformSound != null) {
+          _playSound(ti.transformSound!);
+        }
+
+        setState(() {
+          _isTransformed = true;
+          _visibleCracks = List.filled(ti.crackImages!.length, false);
+        });
+
+        // 변환 애니메이션 시작
+        _transformAnimController?.forward().then((_) {
+          // 팝업 옵션이 있으면 팝업 표시
+          if (ti.transformPopupLink != null && ti.transformPopupButtonText != null) {
+            _showTransformPopup(ti);
+          }
+        });
+        return; // 변환 후에는 더 이상 터치 처리하지 않음
+      }
+    }
+
     // Shake effect
     setState(() {
       _shakeOffset = Offset(
@@ -658,15 +1087,49 @@ class _DayScreenState extends State<DayScreen> {
     });
   }
 
+  /// 네비게이션 버튼 (이전/다음) - 클릭 사운드 포함
+  Widget _buildNavButton(String text, VoidCallback? onPressed) {
+    if (onPressed == null) {
+      return ElevatedButton(
+        onPressed: null,
+        child: Text(text),
+      );
+    }
+
+    return GestureDetector(
+      onTapDown: (_) {
+        _audioPlayer.stop();
+        _audioPlayer.play(AssetSource('sounds/MouseClick1.wav'));
+      },
+      onTapUp: (_) async {
+        await _audioPlayer.stop();
+        await _audioPlayer.play(AssetSource('sounds/MouseClick2.wav'));
+        await Future.delayed(const Duration(milliseconds: 100));
+        onPressed();
+      },
+      onTapCancel: () => _audioPlayer.stop(),
+      child: AbsorbPointer(
+        child: ElevatedButton(
+          onPressed: () {},
+          child: Text(text),
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _flashTimer?.cancel();
     _countdownTimer?.cancel();
     _animationTimer?.cancel();
+    _repeatSoundOperation?.cancel();
+    _repeatCompleteSubscription?.cancel();
     _audioPlayer.dispose();
     _repeatAudioPlayer.dispose();
+    _backgroundMusicPlayer.dispose();
     _disposeVideoController();
     _exitWarningTimer?.cancel();
+    _transformAnimController?.dispose();
     for (var player in _combatPlayers) {
       player.dispose();
     }
@@ -714,8 +1177,12 @@ class _DayScreenState extends State<DayScreen> {
                             padding: const EdgeInsets.only(bottom: 16.0),
                             child: Stack(
                               children: [
-                                Image.asset(
-                                  ti.imageAssetPath!,
+                                // 원본 이미지 또는 변환된 이미지
+                                if (ti.hasCrackTransform && _isTransformed)
+                                  _buildTransformedImage(ti)
+                                else
+                                  Image.asset(
+                                    ti.imageAssetPath!,
                               width: double.infinity,
                               fit: BoxFit.fitWidth,
                               errorBuilder: (context, error, stackTrace) {
@@ -731,6 +1198,19 @@ class _DayScreenState extends State<DayScreen> {
                                 );
                               },
                             ),
+                                // Crack 오버레이 이미지들
+                                if (ti.hasCrackTransform && !_isTransformed)
+                                  ...List.generate(ti.crackImages!.length, (index) {
+                                    if (_visibleCracks.length > index && _visibleCracks[index]) {
+                                      return Positioned.fill(
+                                        child: Image.asset(
+                                          ti.crackImages![index],
+                                          fit: BoxFit.fitWidth,
+                                        ),
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  }),
                             if (_showPreviousPagePreview && _currentPage > 0)
                               Builder(builder: (context) {
                                 final prevTi = widget.tiArray[_currentPage - 1];
@@ -999,27 +1479,28 @@ class _DayScreenState extends State<DayScreen> {
                         if (ti.hasChoices)
                           Padding(
                             padding: const EdgeInsets.only(top: 24.0, left: 16.0, right: 16.0),
-                            child: Row(
-                              children: ti.choices!.map((choice) {
-                                return Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                                    child: ElevatedButton(
-                                      onPressed: () => _handleChoiceSelection(choice),
-                                      style: ElevatedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(vertical: 16),
-                                        backgroundColor: Colors.blue.shade600,
-                                        foregroundColor: Colors.white,
+                            child: ti.choices!.length <= 2
+                              // 2개 이하: 가로 배열
+                              ? Row(
+                                  children: ti.choices!.map((choice) {
+                                    return Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                        child: _buildChoiceButton(choice),
                                       ),
-                                      child: Text(
-                                        choice.label,
-                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
+                                    );
+                                  }).toList(),
+                                )
+                              // 3개 이상: 세로 배열
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: ti.choices!.map((choice) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 8.0),
+                                      child: _buildChoiceButton(choice),
+                                    );
+                                  }).toList(),
+                                ),
                           ),
 
                         if (ti.isYoutubeLink)
@@ -1161,17 +1642,17 @@ class _DayScreenState extends State<DayScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(
-                    onPressed: _currentPage > 0 ? _previousPage : null,
-                    child: const Text('< 이전'),
+                  _buildNavButton(
+                    '< 이전',
+                    _currentPage > 0 ? _previousPage : null,
                   ),
                   Text(
                     '${_currentPage + 1} / ${widget.tiArray.length}',
                     style: const TextStyle(fontSize: 16),
                   ),
-                  ElevatedButton(
-                    onPressed: ti.hasChoices ? null : _nextPage,
-                    child: Text(ti.hasChoices ? '선택하세요' : '다음 >'),
+                  _buildNavButton(
+                    ti.hasChoices ? '선택하세요' : '다음 >',
+                    ti.hasChoices ? null : _nextPage,
                   ),
                 ],
               ),

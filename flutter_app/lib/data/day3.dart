@@ -46,7 +46,7 @@ class Day3 {
       TI(
         text: "1996년 수상작 - 브레이브 하트\n   ▽\n제 다음 장소는 '화장실'입니다.\n<<예시-귀여운 하트 모양의 캐릭터가 화장실에서 똥을 싸고 있어요. 하트는 아주 용감해서 '스파르타'라고 소리치고 있네요. 브레이브는 영어로 용감하다는 뜻입니다. >>\n$w",
         imageAssetPath: 'assets/images/heart.png',
-      ),
+      ).withSound('assets/sounds/sparta.mp3'),
       TI(
         text: "1997년 수상작 - 잉글리쉬 페이션트\n   ▽\n제 다음 장소는 '옷 방'입니다.\n<<예시-저는 잉글리쉬 페이션트를 영국인의 열정이라고 해석하니 축구선수 루니가 떠오르더군요. 그래서 루니가 제 옷방에서 유니폼을 찾고 있는 장면을 상상했습니다.>>\n$w",
         imageAssetPath: 'assets/images/d3_10.png',

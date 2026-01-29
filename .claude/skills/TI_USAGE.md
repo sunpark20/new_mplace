@@ -171,6 +171,98 @@ TI(
 - 인덱스를 계산할 때 주석이나 빈 줄은 제외하고 실제 TI 항목만 카운트하세요
 - 선택지가 있는 페이지에서는 일반 스와이프로도 다음 페이지 이동이 가능합니다
 
+### 11. 반복 사운드 `.withRepeatSound(초기사운드, 반복사운드, 횟수)` ⭐ NEW
+
+초기 사운드를 한 번 재생한 후, 반복 사운드를 지정된 횟수만큼 재생합니다.
+카운터 표시 여부를 선택할 수 있습니다.
+
+```dart
+TI(
+  text: "박수 소리를 들어보세요",
+  imageAssetPath: 'assets/images/clap.png',
+).withRepeatSound(
+  'assets/sounds/mobak.mp3',   // 초기 사운드 (1회)
+  'assets/sounds/danbak.mp3',  // 반복 사운드
+  99,                           // 반복 횟수
+  showCounter: true,           // 카운터 표시 (기본값: true)
+)
+```
+
+99회 완료 시 축하 팝업이 자동으로 표시됩니다.
+
+### 12. 비디오 재생 `.withVideo('경로')` ⭐ NEW
+
+페이지에 비디오를 추가하고 자동 재생합니다. 이미지 대신 비디오가 표시됩니다.
+
+```dart
+TI(
+  text: "포레스트 검프 명장면",
+  imageAssetPath: 'assets/images/gump_thumbnail.png',
+).withVideo('assets/videos/gump.mp4')
+```
+
+비디오는 한 번 재생되고 멈춥니다 (반복 없음).
+
+### 13. 크랙 변환 효과 `.withCrackTransform(...)` ⭐ NEW
+
+터치할 때마다 균열 이미지가 나타나고, 특정 횟수 도달 시 이미지가 변환되는 효과입니다.
+
+```dart
+import '../models/ti.dart'; // TransformEffect enum 포함
+
+TI(
+  text: "화면을 터치하세요!",
+  imageAssetPath: 'assets/images/hobbit1.webp',
+).withCrackTransform(
+  cracks: ['assets/images/crack1.png', 'assets/images/crack2.png'],
+  thresholds: [33, 66],           // 각 crack이 나타나는 터치 횟수
+  transformAt: 99,                 // 이미지 변환이 일어나는 터치 횟수
+  transformTo: 'assets/images/citadel.webp',  // 변환될 이미지
+  sound: 'assets/sounds/ClanInvitation.wav',  // 변환 시 재생할 사운드 (옵션)
+  effect: TransformEffect.fadeIn,  // 변환 애니메이션 효과
+  // 팝업 옵션 (선택사항)
+  popupTitle: '99번 달성!',        // 팝업 제목 (생략 시 "축하합니다!")
+  popupButtonText: '시타델 가입하기',  // 버튼 텍스트
+  popupLink: 'https://discord.com/invite/xxx',  // 버튼 클릭 시 열리는 링크
+)
+```
+
+**사용 가능한 TransformEffect (10가지)**:
+
+| Effect | 설명 |
+|--------|------|
+| `fadeIn` | 서서히 나타남 (기본값) |
+| `slideLeft` | 오른쪽에서 왼쪽으로 슬라이드 |
+| `slideRight` | 왼쪽에서 오른쪽으로 슬라이드 |
+| `slideUp` | 아래에서 위로 슬라이드 |
+| `slideDown` | 위에서 아래로 슬라이드 |
+| `scale` | 중앙에서 커지며 나타남 |
+| `rotate` | 회전하며 나타남 |
+| `flip` | 3D 뒤집히며 전환 |
+| `zoomBlur` | 줌 인하며 선명해짐 |
+| `dissolve` | 부드럽게 녹아드는 전환 |
+
+**동작 방식**:
+1. 터치할 때마다 카운터 증가
+2. thresholds 값에 도달하면 해당 crack 이미지가 오버레이로 표시
+3. transformAt 값에 도달하면 소리 재생 + 이미지 변환 + 애니메이션 효과
+4. 변환 후에는 더 이상 터치 카운터가 증가하지 않음
+5. 팝업 옵션 설정 시 변환 완료 후 팝업 표시 (popupButtonText + popupLink 필수)
+
+### 14. 백그라운드 음악 `.withBackgroundMusic('경로')` ⭐ NEW
+
+페이지에 진입하면 배경 음악이 루프 재생되고, 페이지를 벗어나면 자동 정지됩니다.
+
+```dart
+TI(
+  text: "기억의 궁전 여정 시작",
+  imageAssetPath: 'assets/images/hobbit1.webp',
+).withBackgroundMusic('assets/sounds/FiveArmies.mp3')
+```
+
+- 다른 효과음(터치 사운드, 변환 사운드)과 동시 재생 가능
+- 페이지 이동 시 자동 정지
+
 ## 메서드 체이닝 조합 예시
 
 여러 메서드를 조합할 수 있습니다:

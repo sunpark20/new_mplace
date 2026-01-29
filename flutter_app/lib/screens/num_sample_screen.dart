@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/item.dart';
 
@@ -104,6 +106,20 @@ class _NumSampleScreenState extends State<NumSampleScreen> {
       appBar: AppBar(
         title: const Text('숫자-인물 가이드'),
         actions: [
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/images/ss.svg',
+              width: 24,
+              height: 24,
+            ),
+            onPressed: () async {
+              final uri = Uri.parse('https://docs.google.com/spreadsheets/d/1mW53zYRRqROPWqdaNnsTXykSO5YP_a5EBjojP31YrlM/edit?usp=sharing');
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            },
+          ),
+          const SizedBox(width: 4),
           IconButton(
             icon: const Icon(Icons.help_outline),
             onPressed: () {
