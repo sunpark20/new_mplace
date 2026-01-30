@@ -74,7 +74,7 @@ class Day1 {
         imageAssetPath: 'assets/images/d2_12.png',
       ).withSound('assets/sounds/stomachgrowl.mp3').withOverlayText("반드시 눈을 감고 머리속으로\n상상한 뒤에 넘어갑시다."),
       TI(
-        text: "준비물9. 해바라기 - 무릎\n   ▽\n무릎에 예쁜 해바라기를 달았네요. 해바라기들이 해를 바라보고 있네요.\n<span style='color: #ff8000; font-weight: bold;'>+9 해바라기 각반</span> 장착!!",
+        text: "준비물9. 해바라기 - 무릎$arrow_h무릎에 예쁜 해바라기를 달았네요. 해바라기들이 해를 바라보고 있네요.\n<span style='color: #ff8000; font-weight: bold;'>+9 해바라기 각반</span> 장착!!",
         imageAssetPath: 'assets/images/d2_13.png',
       ).asHtml().withSound('assets/sounds/EquipArmorDouble.mp3').withOverlayText("반드시 눈을 감고 머리속으로\n상상한 뒤에 넘어갑시다."),
       TI(
@@ -110,8 +110,8 @@ class Day1 {
         popupLink: 'https://discord.com/invite/gfWYEFkDPd',
       ),
       TI(
-        text: "오감은 기억력의 일등공신입니다. 코찌르기, 양말냄새 상상하기!! 진짜 해보셨죠??\n혹시 다 못마추셨어도 실망하지 마세요.\n우리는 준비물의 순서까지도 외우고 있습니다! 다음 단계에서 만나요!",
-        imageAssetPath: 'assets/images/d0_3.png',
+        text: "오감은 기억력의 일등 공신입니다.$arrow손가락으로 코찌르기, 양말냄새 상상하기!! 진짜 하신거죠??\n혹시 다 못마추셨어도 실망하지 마세요.\n우리는 준비물의 순서까지도 외우고 있습니다!$arrow다음 단계에서 연습해보자구요!",
+        imageAssetPath: 'assets/images/d1_f.jpg',
       ),
     ];
   }

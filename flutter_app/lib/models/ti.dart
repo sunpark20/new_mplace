@@ -1,3 +1,7 @@
+// 공통 텍스트 포맷팅 상수
+const String arrow = "\n   ▽\n";
+const String arrow_h = "<br>   ▽<br>";
+
 /// 선택지 클래스 - 분기 처리에 사용
 /// [label]: 버튼에 표시될 텍스트
 /// [targetIndex]: 선택 시 이동할 TI 배열의 인덱스

@@ -1,12 +1,11 @@
 import '../models/ti.dart';
-const String arrow ="\n   ▽\n";
-const String arrow_h = "<br>&nbsp;&nbsp;&nbsp;▽<br>";
+
 class Day0 {
 
   static List<TI> getTiArray() {
     return [
       TI(
-        text: "'기억의 궁전'에 대한 기록은 기원전 86년, 로마 시대의 그리스 문헌에서 찾아볼 수 있습니다.$arrow기록 매체가 귀했던 고대 사회에서, 웅변이나 연설을 하기 위해 기억술은 선택이 아닌 필수였습니다.",
+        text: "'기억의 궁전'에 대한 기록은 기원전 86년, 로마 시대의 그리스 문헌에서 찾아볼 수 있습니다.$arrow기록 매체가 귀했던 고대 사회에서, 웅변이나 연설을 위한 기억술은 선택이 아닌 필수였습니다.",
         imageAssetPath: 'assets/images/d0_5.png',
       ),
       TI(
@@ -15,8 +14,8 @@ class Day0 {
         imageAssetPath: 'assets/images/d0_2.png',
       ).asHtml(),
       TI(
-        text: "프로 기억력 선수(??) 들어보셨나요.$arrow_h각 나라의 대표들은 옥스포드 사전의 6만개 단어의 뜻을 암기하고, <a href='https://www.guinnessworldrecords.com/world-records/most-pi-places-memorised'>7만자리의 원주율값</a>을 순서대로 외운답니다."+
-            "$arrow_h서번트, 포토메모리가 아닌 평범한 우리도 기억의궁전으로 할 수 있어요!",
+        text: "프로 기억력 선수(??) 들어보셨나요.$arrow_h각 나라의 대표들은 옥스포드 사전의 6만개 단어, <a href='https://www.guinnessworldrecords.com/world-records/most-pi-places-memorised'>7만자리의 원주율값</a>을 순서대로 외운답니다."+
+            "$arrow_h서번트, 포토메모리가 아닌 평범한 우리도 기억의궁전 <br><span style='color: red; font-size: 23px;'>할 수 있어요!!!</span>",
         imageAssetPath: 'assets/images/d0_1-down.webp',
       ).asHtml(),
       TI(

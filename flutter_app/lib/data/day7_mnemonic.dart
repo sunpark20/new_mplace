@@ -27,7 +27,7 @@ class Day7Mnemonic {
       // 인덱스 3 
       TI(
         text: "이런.. 방법이 없을까요??\n   ▽\n혹시.. 돈을 기억의궁전에 숨길 수 있을까??",
-        imageAssetPath: 'assets/images/b_3.png',
+        imageAssetPath: 'assets/images/d7_4.png',
       ),
       // 인덱스 4 
       TI(
@@ -40,7 +40,8 @@ class Day7Mnemonic {
         imageAssetPath: 'assets/images/b_5.webp',
       ).asHtml(),
       TI(
-        text: "다음책과 유튜브동영상으로 각자 검증해보세요. 기초적인 내용들로 준비했습니다.$arrow_h"+
+        text: "각자 검증해보세요. 기초적인 책, 유튜브 영상을 준비했습니다.<br>"+
+        "책을 읽고 비트코인의 철학에 설득이 되셨다면, 기억의궁전과 함께 니모닉을 뇌속에 저장하세요. 대재난에도 돈의 주권을 지킬 수 있게 될 것입니다.$arrow_h"+
         "<br><a href='https://www.youtube.com/watch?v=bBC-nXj3Ng4'>비트코인 설명영상</a><br><br>"+
         "'구구' 찾아라. 비밀의문 열린다.",
         imageAssetPath: 'assets/images/b_6.webp',
