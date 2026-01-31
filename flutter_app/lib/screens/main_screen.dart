@@ -181,7 +181,7 @@ class _MainScreenState extends State<MainScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Image.asset(
-                        'assets/images/bitcoin.png',
+                        'assets/images/bitcoin.webp',
                         width: 20,
                         height: 20,
                       ),

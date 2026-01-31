@@ -56,6 +56,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
 
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
+  bool _autoVideoPlayed = false;  // autoFullscreenVideo 재생 완료 여부
   final AudioPlayer _backgroundMusicPlayer = AudioPlayer();
 
   // Crack Transform 관련 변수
@@ -277,12 +278,15 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
     _currentRepeatPath = null;
     _repeatAudioPlayer.stop();
     _disposeVideoController();
+    _autoVideoPlayed = false;
 
     final ti = widget.tiArray[_currentPage];
 
-    // 자동 풀스크린 비디오 재생
+    // 자동 풀스크린 비디오 재생 (build 완료 후 호출)
     if (ti.hasAutoFullscreenVideo) {
-      _playAutoFullscreenVideo(ti.autoFullscreenVideo!);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _playAutoFullscreenVideo(ti.autoFullscreenVideo!);
+      });
     }
 
     if (ti.hasVideo) {
@@ -496,18 +500,25 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
 
   /// 페이지 로드 시 자동으로 풀스크린 비디오 재생
   void _playAutoFullscreenVideo(String videoPath) async {
-    // 약간의 딜레이 후 비디오 화면으로 이동 (UI가 먼저 빌드되도록)
-    await Future.delayed(const Duration(milliseconds: 100));
+    debugPrint('=== _playAutoFullscreenVideo started ===');
     if (mounted) {
+      debugPrint('=== Navigator.push starting ===');
       await Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => FullscreenVideoScreen(videoPath: videoPath),
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              FullscreenVideoScreen(videoPath: videoPath),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
         ),
       );
-      // 비디오 완료 후 돌아오면 setState로 UI 갱신
+      debugPrint('=== Navigator.push returned, mounted=$mounted ===');
+      // 비디오 완료 후 돌아오면 콘텐츠 표시
       if (mounted) {
-        setState(() {});
+        debugPrint('=== Setting _autoVideoPlayed = true ===');
+        setState(() {
+          _autoVideoPlayed = true;
+        });
       }
     }
   }
@@ -535,6 +546,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
 
   void _playBackgroundMusic(String path) async {
     try {
+      await _backgroundMusicPlayer.stop();
       final cleanPath = path.replaceFirst('assets/', '');
       await _backgroundMusicPlayer.setReleaseMode(ReleaseMode.loop);
       await _backgroundMusicPlayer.play(AssetSource(cleanPath));
@@ -1140,16 +1152,32 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final ti = widget.tiArray[_currentPage];
 
+    // autoFullscreenVideo가 있고 아직 재생 전이면 검은 화면만 표시 (잔상 방지)
+    if (ti.hasAutoFullscreenVideo && !_autoVideoPlayed) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Container(color: Colors.black),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Column(
+      body: SafeArea(
+        child: Column(
         children: [
           Expanded(
             child: Stack(
               children: [
                 GestureDetector(
+                  // 스와이프 (hasTouchSound/crackTransform이 아닌 페이지에서만)
+                  onHorizontalDragEnd: !ti.hasTouchSound && !ti.hasCrackTransform
+                      ? (details) {
+                          if (details.velocity.pixelsPerSecond.dx > 500 && _currentPage > 0) {
+                            _previousPage();
+                          } else if (details.velocity.pixelsPerSecond.dx < -500) {
+                            if (!ti.hasChoices) _nextPage();
+                          }
+                        }
+                      : null,
                   onTapDown: (details) {
                     if (ti.hasTouchSound) {
                       _handleHighFiveTouch(details.localPosition);
@@ -1646,9 +1674,20 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                     '< 이전',
                     _currentPage > 0 ? _previousPage : null,
                   ),
-                  Text(
-                    '${_currentPage + 1} / ${widget.tiArray.length}',
-                    style: const TextStyle(fontSize: 16),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.home),
+                        onPressed: () => Navigator.pop(context),
+                        tooltip: '홈으로',
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${_currentPage + 1} / ${widget.tiArray.length}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
                   ),
                   _buildNavButton(
                     ti.hasChoices ? '선택하세요' : '다음 >',
@@ -1659,6 +1698,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
             ),
           ),
         ],
+        ),
       ),
     );
   }

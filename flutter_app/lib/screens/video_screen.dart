@@ -53,9 +53,13 @@ class _VideoScreenState extends State<VideoScreen> {
   @override
   void dispose() {
     // Reset to portrait mode
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
+    try {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+    } catch (e) {
+      debugPrint('Orientation change failed: $e');
+    }
     _controller?.dispose();
     super.dispose();
   }

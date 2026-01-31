@@ -17,6 +17,7 @@ class _FullscreenVideoScreenState extends State<FullscreenVideoScreen> {
   VideoPlayerController? _controller;
   bool _isInitialized = false;
   bool _hasError = false;
+  bool _isFadingOut = false;
 
   @override
   void initState() {
@@ -67,21 +68,54 @@ class _FullscreenVideoScreenState extends State<FullscreenVideoScreen> {
       // 동영상이 끝났으면 화면 닫기
       if (position >= duration - const Duration(milliseconds: 500)) {
         _controller!.removeListener(_onVideoProgress);
-        if (mounted) {
-          Navigator.pop(context);
-        }
+        _closeWithTransition();
       }
     }
   }
 
+  Future<void> _closeWithTransition() async {
+    debugPrint('=== _closeWithTransition started ===');
+    if (!mounted) {
+      debugPrint('=== NOT MOUNTED, returning ===');
+      return;
+    }
+
+    // 1. 페이드아웃 시작
+    setState(() => _isFadingOut = true);
+
+    // 2. 비디오 정지
+    await _controller?.pause();
+
+    // 3. 페이드아웃 애니메이션 대기
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    // 4. orientation 미리 변경 (iPad에서 실패할 수 있음)
+    try {
+      await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    } catch (e) {
+      debugPrint('Orientation change failed: $e');
+    }
+
+    // 5. 회전 완료 대기 후 pop
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    debugPrint('=== Calling Navigator.pop, mounted=$mounted ===');
+    if (mounted) Navigator.pop(context);
+    debugPrint('=== Navigator.pop done ===');
+  }
+
   @override
   void dispose() {
-    // 세로모드로 복귀
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
-    // 시스템 UI 복원
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    // _closeWithTransition에서 이미 처리하지 않은 경우만
+    if (!_isFadingOut) {
+      try {
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      } catch (e) {
+        debugPrint('Orientation change failed: $e');
+      }
+    }
     _controller?.removeListener(_onVideoProgress);
     _controller?.dispose();
     super.dispose();
@@ -94,25 +128,29 @@ class _FullscreenVideoScreenState extends State<FullscreenVideoScreen> {
       canPop: false,
       child: Scaffold(
         backgroundColor: Colors.black,
-        body: Center(
-          child: _hasError
-              ? const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, color: Colors.white, size: 64),
-                    SizedBox(height: 16),
-                    Text(
-                      '동영상을 재생할 수 없습니다',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ],
-                )
-              : _isInitialized && _controller != null
-                  ? AspectRatio(
-                      aspectRatio: _controller!.value.aspectRatio,
-                      child: VideoPlayer(_controller!),
-                    )
-                  : const CircularProgressIndicator(color: Colors.white),
+        body: AnimatedOpacity(
+          opacity: _isFadingOut ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          child: Center(
+            child: _hasError
+                ? const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.white, size: 64),
+                      SizedBox(height: 16),
+                      Text(
+                        '동영상을 재생할 수 없습니다',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
+                  )
+                : _isInitialized && _controller != null
+                    ? AspectRatio(
+                        aspectRatio: _controller!.value.aspectRatio,
+                        child: VideoPlayer(_controller!),
+                      )
+                    : const CircularProgressIndicator(color: Colors.white),
+          ),
         ),
       ),
     );
