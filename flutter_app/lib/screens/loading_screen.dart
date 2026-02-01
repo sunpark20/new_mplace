@@ -30,7 +30,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/main.png'),
+            image: AssetImage('assets/images/main.webp'),
             fit: BoxFit.cover,
           ),
         ),

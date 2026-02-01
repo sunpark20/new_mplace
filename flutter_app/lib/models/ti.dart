@@ -35,7 +35,8 @@ class TI {
   final String? soundAssetPath;
   final int? alarmTimeInSeconds;
   final bool isHtml;
-  final bool isYoutubeLink;
+  final bool hasFullscreenVideoButton;
+  final String? fullscreenVideoPath;
   final bool isTouchPage;
   final String? resultImageAssetPath;
   final bool hasTouchSound;
@@ -71,7 +72,8 @@ class TI {
     this.soundAssetPath,
     this.alarmTimeInSeconds,
     this.isHtml = false,
-    this.isYoutubeLink = false,
+    this.hasFullscreenVideoButton = false,
+    this.fullscreenVideoPath,
     this.isTouchPage = false,
     this.resultImageAssetPath,
     this.hasTouchSound = false,
@@ -106,7 +108,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
@@ -133,7 +136,8 @@ class TI {
       soundAssetPath: sound,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
@@ -160,7 +164,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: true,
@@ -179,7 +184,10 @@ class TI {
     );
   }
 
-  TI asYoutubeLink() {
+  /// 비디오 버튼 추가 - 클릭 시 풀스크린 가로모드로 재생
+  /// [videoPath]: 재생할 로컬 비디오 경로 (없으면 기본 ted_video.mp4)
+  /// 사용 예: .withFullscreenVideoButton() 또는 .withFullscreenVideoButton('assets/videos/elon.mp4')
+  TI withFullscreenVideoButton([String? videoPath]) {
     return TI(
       text: text,
       imageAssetPath: imageAssetPath,
@@ -187,7 +195,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: true,
+      hasFullscreenVideoButton: true,
+      fullscreenVideoPath: videoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
@@ -196,7 +205,7 @@ class TI {
       initialSound: initialSound,
       repeatCount: repeatCount,
       showCounter: showCounter,
-      videoPath: videoPath,
+      videoPath: this.videoPath,
       crackImages: crackImages,
       crackThresholds: crackThresholds,
       transformThreshold: transformThreshold,
@@ -214,7 +223,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: seconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
@@ -241,7 +251,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: true,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
@@ -268,7 +279,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: true,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
@@ -295,7 +307,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: image,
       hasTouchSound: hasTouchSound,
@@ -333,7 +346,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
@@ -362,7 +376,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
@@ -405,7 +420,8 @@ class TI {
       soundAssetPath: repeat,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
@@ -428,9 +444,9 @@ class TI {
     );
   }
 
-  /// 비디오 추가 - 페이지에 비디오를 추가하고 자동재생
-  /// 사용 예: .withVideo('assets/videos/gump.mp4')
-  TI withVideo(String video) {
+  /// 인라인 비디오 추가 - 페이지 내에서 자동재생
+  /// 사용 예: .withInlineVideo('assets/videos/gump.mp4')
+  TI withInlineVideo(String video) {
     return TI(
       text: text,
       imageAssetPath: imageAssetPath,
@@ -438,7 +454,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
@@ -459,7 +476,7 @@ class TI {
 
   /// 터치 시 균열 효과 + 이미지 전환 추가
   /// 사용 예: .withCrackTransform(
-  ///   cracks: ['assets/images/crack1.png', 'assets/images/crack2.png'],
+  ///   cracks: ['assets/images/crack1.webp', 'assets/images/crack2.webp'],
   ///   thresholds: [33, 66],
   ///   transformAt: 99,
   ///   transformTo: 'assets/images/hobbit2.webp',
@@ -484,7 +501,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: true,
@@ -515,7 +533,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
@@ -546,7 +565,8 @@ class TI {
       soundAssetPath: soundAssetPath,
       alarmTimeInSeconds: alarmTimeInSeconds,
       isHtml: isHtml,
-      isYoutubeLink: isYoutubeLink,
+      hasFullscreenVideoButton: hasFullscreenVideoButton,
+      fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
       resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,

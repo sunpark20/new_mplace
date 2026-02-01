@@ -131,7 +131,7 @@ class _NumSampleScreenState extends State<NumSampleScreen> {
                     child: Column(
                       children: [
                         Image.asset(
-                          'assets/images/d4_2.png',
+                          'assets/images/d4_2.webp',
                           errorBuilder: (context, error, stackTrace) {
                             return const SizedBox();
                           },

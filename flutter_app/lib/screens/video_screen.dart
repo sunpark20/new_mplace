@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'dart:async';
 
 class VideoScreen extends StatefulWidget {
-  const VideoScreen({super.key});
+  final String? videoPath;
+
+  const VideoScreen({super.key, this.videoPath});
 
   @override
   State<VideoScreen> createState() => _VideoScreenState();
@@ -16,6 +18,9 @@ class _VideoScreenState extends State<VideoScreen> {
   bool _isInitialized = false;
   bool _hasError = false;
   String _errorMessage = '';
+
+  // 기본 비디오 경로
+  static const String _defaultVideoPath = 'assets/videos/ted_video.mp4';
 
   @override
   void initState() {
@@ -29,8 +34,9 @@ class _VideoScreenState extends State<VideoScreen> {
   }
 
   Future<void> _initializeVideo() async {
+    final path = widget.videoPath ?? _defaultVideoPath;
     try {
-      _controller = VideoPlayerController.asset('assets/videos/ted_video.mp4');
+      _controller = VideoPlayerController.asset(path);
       await _controller!.initialize();
 
       if (mounted) {

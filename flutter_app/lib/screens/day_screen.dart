@@ -475,26 +475,53 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
 
   void _initializeVideo(String videoPath) async {
     try {
+      // 기존 컨트롤러가 있으면 먼저 정리
+      await _disposeVideoControllerAsync();
+
       final cleanPath = videoPath.replaceFirst('assets/', '');
       _videoController = VideoPlayerController.asset('assets/$cleanPath');
       await _videoController!.initialize();
-      await _videoController!.setLooping(false);
-      await _videoController!.play();
+      await _videoController!.setLooping(false); // 한 번만 재생
+
       if (mounted) {
         setState(() {
           _isVideoInitialized = true;
         });
+        await _videoController!.play();
       }
     } catch (e) {
       debugPrint('Error initializing video: $e');
+      _disposeVideoControllerAsync();
+    }
+  }
+
+  Future<void> _disposeVideoControllerAsync() async {
+    if (_videoController != null) {
+      try {
+        await _videoController!.pause();
+        await _videoController!.dispose();
+      } catch (e) {
+        debugPrint('Error disposing video controller: $e');
+      }
+      _videoController = null;
+      _isVideoInitialized = false;
     }
   }
 
   void _disposeVideoController() {
     if (_videoController != null) {
-      _videoController!.dispose();
+      final controller = _videoController;
       _videoController = null;
       _isVideoInitialized = false;
+      // 비동기로 정리하되, 현재 컨트롤러 참조 유지
+      controller!.pause().then((_) {
+        controller.dispose();
+      }).catchError((e) {
+        debugPrint('Error disposing video controller sync: $e');
+        try {
+          controller.dispose();
+        } catch (_) {}
+      });
     }
   }
 
@@ -1195,9 +1222,34 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                         if (ti.hasVideo && _isVideoInitialized)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16.0),
-                            child: AspectRatio(
-                              aspectRatio: _videoController!.value.aspectRatio,
-                              child: VideoPlayer(_videoController!),
+                            child: Stack(
+                              children: [
+                                AspectRatio(
+                                  aspectRatio: _videoController!.value.aspectRatio,
+                                  child: VideoPlayer(_videoController!),
+                                ),
+                                if (ti.overlayText != null)
+                                  Positioned(
+                                    top: 16,
+                                    left: 16,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.5),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        ti.overlayText!,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                         if (ti.hasImage && (!ti.hasTimer || !_timerCompleted) && !ti.hasVideo)
@@ -1531,7 +1583,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                 ),
                           ),
 
-                        if (ti.isYoutubeLink)
+                        if (ti.hasFullscreenVideoButton)
                           Padding(
                             padding: const EdgeInsets.only(top: 24.0, left: 16.0, right: 16.0),
                             child: ElevatedButton.icon(
@@ -1540,7 +1592,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const VideoScreen(),
+                                      builder: (context) => VideoScreen(videoPath: ti.fullscreenVideoPath),
                                     ),
                                   );
                                 } catch (e) {
@@ -1553,7 +1605,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                 }
                               },
                               icon: const Icon(Icons.play_circle_outline),
-                              label: const Text('TED 비디오 재생'),
+                              label: const Text('비디오 재생'),
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.all(16),
                               ),
