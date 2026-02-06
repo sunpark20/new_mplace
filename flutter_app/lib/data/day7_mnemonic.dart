@@ -15,30 +15,44 @@ class Day7Mnemonic {
       ]),
       TI( //인덱스2
         text: "순금바, 현금을 선택하셨습니다.\n   ▽\n응, 국경에서 다 압수$arrow다음으로 가서 해결책을 찾아봅시다.",
-        imageAssetPath: 'assets/images/b_1.webp',
+        imageAssetPath: 'assets/images/d7_boundary.webp',
       ).withSound('assets/sounds/b_1.mp3').withSound('assets/sounds/b_2.mp3'),
       TI( //인덱스3
         text: "모바일뱅킹(미국달러도 비축)을 선택하셨습니다.\n   ▽\n응, 한국 전산망 파괴, USA 해외거래소 자금동결$arrow다음으로 가서 해결책을 찾아봅시다.",
-        imageAssetPath: 'assets/images/b_2.webp',
+        imageAssetPath: 'assets/images/d7_trump.webp',
       ).withSound('assets/sounds/trump.mp3'),
       TI( //인덱스4
-        text: "이런.. 방법이 없을까요??\n   ▽\n혹시.. 돈을 기억의궁전에 숨길 수 있을까??",
-        imageAssetPath: 'assets/images/d7_4.webp',
+        text: "아니.. 다람쥐 선생님 그게 무슨 소리죠??",
+        imageAssetPath: 'assets/images/d7_sq.webp',
       ),
       TI( //인덱스5
-        text: "맞습니다. 단어 24자리를 순서대로 외우면 됩니다. 종이하나 없이 뇌에 비트코인을 저장할수 있습니다.$arrow핵전쟁이 일어나도 우리 가족들을 안전하게 지켜줄 자산은 단연코 비트코인입니다.ㅇ\nd\nddd\nddd\nddd\nd\nddd\nddd\nddd",
-        imageAssetPath: 'assets/images/bitcoin.webp',
+        text: "월동 준비!!! 바쁘다.\n"+
+              "자세한건 나중에 동영상 봐, 내가 짧게 설명해주지\n"+
+              "비트코인의 주소는 내가 모은 도토리 수 만큼이나 많지",
+        imageAssetPath: 'assets/images/d7_address2.webp',
       ),
+      TI( //인덱스5
+        text: "이건 또 다른 친구가 준 팜플렛인데 그냥 버리기 아까워서 넣었다네\n"+
+              "조금 다른데 비슷하다네\n"+
+              "비트코인의 주소는 내가 모은 도토리 수 만큼이나 많지 허허",
+        imageAssetPath: 'assets/images/d7_address.webp',
+      ),
+      TI( //인덱스5
+        text: "자넨 졸업생이니 더이상 <미션>은 안하겠네. 우린 이런거 5분안에 다 외우지 않나?<br>"+
+              "이 주소는 <a href='https://github.com/bitcoin/bips/blob/master/bip-0039/english.txt'>bip-0039</a>를 이용해 단어 24로 나타낼 수 있지<br>"+
+              "이해가 안간다구? 일단 단어 24개(순서대로)를 외우면 된다고 알고 있게나",
+        imageAssetPath: 'assets/images/d7_24word.webp',
+      ).asHtml(),
       TI( //인덱스6
-        text: "그 누구도 신뢰 하지 않는다. 검증한다. 비트코인의 핵심 철학입니다.",
-        imageAssetPath: 'assets/images/b_5.webp',
+        text: "그 누구도 신뢰 하지 않는다. 검증한다. 비트코인의 핵심 철학이네.",
+        imageAssetPath: 'assets/images/d7_trust.webp',
       ).asHtml(),
       TI( //인덱스7
-        text: "각자 검증해보세요. 기초적인 책, 유튜브 영상을 준비했습니다.<br>"+
-        "책을 읽고 비트코인의 철학에 설득이 되셨다면, 기억의궁전과 함께 니모닉을 뇌속에 저장하세요. 대재난에도 돈의 주권을 지킬 수 있게 될 것입니다.$arrow_h"+
+        text: "각자 비트코인을 검증해보시게나. 기초적인 책, 유튜브 영상을 준비했다네.<br>"+
+        "대빙하기에도 도토.. 아니 돈의 주권을 지킬 수 있게 될거야$arrow_h"+
         "<br><a href='https://www.youtube.com/watch?v=bBC-nXj3Ng4'>비트코인 설명영상</a><br><br>"+
         "'구구' 찾아라. 비밀의문 열린다.",
-        imageAssetPath: 'assets/images/b_6.webp',
+        imageAssetPath: 'assets/images/d7_dalas.webp',
       ).asHtml(),
     ];
   }

@@ -9,8 +9,8 @@ class Day0 {
         imageAssetPath: 'assets/images/d0_5.webp',
       ),
       TI( //인덱스2
-        text: "동물은 직감적으로 공간을 기억합니다.<br>   ▽<br>뇌에는 공간을 인지하는 Hippocampus(해마)가 있습니다.<br>   ▽<br>"+
-            "<a href='https://namu.wiki/w/%ED%95%98%EC%96%80%EB%A7%88%EC%9D%8C%20%EB%B0%B1%EA%B5%AC'>하얀 마음 백구</a>가 대전으로 팔려갔다가, 300km를 달려 다시 집을 찾아온 이야기 아시죠?(알면 아제)<br>",
+        text: "동물은 직감적으로 공간을 기억합니다.$arrow_h뇌에는 공간을 인지하는 Hippocampus(해마)가 있습니다.$arrow_h"+
+            "<a href='https://namu.wiki/w/%ED%95%98%EC%96%80%EB%A7%88%EC%9D%8C%20%EB%B0%B1%EA%B5%AC'>하얀 마음 백구</a>가 대전으로 팔려갔다가, 300km를 달려 다시 집을 찾아온 이야기 아시죠?(알면 아제)",
         imageAssetPath: 'assets/images/d0_2.webp',
       ).asHtml(),
       TI( //인덱스3

@@ -68,7 +68,7 @@ class Day3 {
       ),
       TI( //인덱스16
         text: "잘 외워지시나요?? 혹시 아직 못외우셨다면, 다시 한번 기억의 궁전을 채우고 오세요. 다음으로 가봅시다.",
-        imageAssetPath: 'assets/images/d2_16.webp',
+        imageAssetPath: 'assets/images/palm.webp',
       ).withTouchSound(),
       TI( //인덱스17
         text: "다시 눈을 감고 마지막 장소로 가서 거꾸로 여행해봅시다.\n!! 잘 되나요?\n거꾸로 또는 중간에서부터도 어디든지 갈 수 있습니다.",
@@ -76,7 +76,7 @@ class Day3 {
       ),
       TI( //인덱스18
         text: "우리는 10개의 수상작을 기억하게 됐습니다!! 짝짝\n   ▽\n이것이 얼마나 머리속에 있을까요..? 내일 일어나 다시 기억의궁전을 거닐어봅시다.\n   ▽\n자세한건 나중에 설명드리겠습니다.",
-        imageAssetPath: 'assets/images/d2_16.webp',
+        imageAssetPath: 'assets/images/palm.webp',
       ).withTouchSound(),
     ];
   }

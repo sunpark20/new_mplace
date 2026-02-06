@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../data/day0.dart';
@@ -10,6 +11,7 @@ import '../data/day2.dart';
 import '../data/day3.dart';
 import '../data/day32.dart';
 import '../data/day4.dart';
+import '../data/day42.dart';
 import '../data/day5_fc.dart';
 import '../data/day6_pao.dart';
 import '../data/day7_mnemonic.dart';
@@ -29,10 +31,32 @@ class _MainScreenState extends State<MainScreen> {
   bool _isLoadingNotice = true;
   static const String _noticeUrl = 'https://gist.githubusercontent.com/q5m5vh7kjn-cyber/80e3cdc9aa2605d8607615e26681514d/raw/gistfile1.txt';
 
+  // 비트코인 라이트닝 주소 (앱 내 안전하게 저장)
+  static const String _btcLightningAddress = "lno1zrxq8pjw7qjlm68mtp7e3yvxee4y5xrgjhhyf2fxhlphpckrvevh50u0qtwhegttle4kls3ffpqcf646cxf3w2yxxkwrctww5uvnu3qsanqhgqsrsmgeljslcyqpmg5ru5etfz6uetx6wetmpu2g7g5zwnuxquxl4zgsqvccxell2n5nctgsr9czs2vffxsrsrsu0y5lahnlk8ae0ymyyq524vqggckfedm6qhq6pkepn2t2l53khrfmq20lv5t2v2mqz02nrf6edaqf2rxa23ldyje4tku6kyvqrvl68n6z6qqshcxt4v5pxgm5wjak8xzyd0tgzs";
+
+  // 텍스트 크기 조절 (핀치 줌)
+  double _textScale = 1.0;
+  double _baseTextScale = 1.0;
+  static const double _minTextScale = 0.8;
+  static const double _maxTextScale = 2.5;
+
   @override
   void initState() {
     super.initState();
     _fetchNotice();
+    _loadTextScale();
+  }
+
+  Future<void> _loadTextScale() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _textScale = prefs.getDouble('textScale') ?? 1.0;
+    });
+  }
+
+  Future<void> _saveTextScale() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('textScale', _textScale);
   }
 
   Future<void> _fetchNotice() async {
@@ -63,14 +87,132 @@ class _MainScreenState extends State<MainScreen> {
       return const SizedBox.shrink();
     }
 
-    return RichText(
-      textAlign: TextAlign.left,
-      text: TextSpan(
-        style: const TextStyle(
-          fontSize: 12,
-          color: Colors.grey,
+    // 매직 키워드들을 위젯으로 변환
+    final widgets = _parseNoticeWithMagicKeywords(_noticeText!);
+
+    if (widgets.length == 1 && widgets.first is RichText) {
+      return widgets.first;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: widgets,
+    );
+  }
+
+  /// 매직 키워드를 파싱하여 위젯 리스트로 변환
+  List<Widget> _parseNoticeWithMagicKeywords(String text) {
+    final List<Widget> widgets = [];
+    final RegExp magicRegex = RegExp(r'\{\{(BTC_BUTTON|TOSS_QR|LIGHTNING_QR)\}\}');
+
+    int lastEnd = 0;
+    for (final match in magicRegex.allMatches(text)) {
+      // 매직 키워드 이전 텍스트
+      if (match.start > lastEnd) {
+        final beforeText = text.substring(lastEnd, match.start).trim();
+        if (beforeText.isNotEmpty) {
+          if (widgets.isNotEmpty) widgets.add(const SizedBox(height: 8));
+          widgets.add(RichText(
+            textAlign: TextAlign.left,
+            text: TextSpan(
+              style: TextStyle(fontSize: 12 * _textScale, color: Colors.grey),
+              children: _parseNoticeText(beforeText),
+            ),
+          ));
+        }
+      }
+
+      // 매직 키워드에 해당하는 위젯 추가
+      final keyword = match.group(1);
+      if (widgets.isNotEmpty) widgets.add(const SizedBox(height: 8));
+
+      if (keyword == 'BTC_BUTTON') {
+        widgets.add(_buildBtcCopyCard());
+      } else if (keyword == 'TOSS_QR') {
+        widgets.add(_buildTossQrImage());
+      } else if (keyword == 'LIGHTNING_QR') {
+        widgets.add(_buildLightningQrImage());
+      }
+
+      lastEnd = match.end;
+    }
+
+    // 마지막 매직 키워드 이후 텍스트
+    if (lastEnd < text.length) {
+      final afterText = text.substring(lastEnd).trim();
+      if (afterText.isNotEmpty) {
+        if (widgets.isNotEmpty) widgets.add(const SizedBox(height: 8));
+        widgets.add(RichText(
+          textAlign: TextAlign.left,
+          text: TextSpan(
+            style: TextStyle(fontSize: 12 * _textScale, color: Colors.grey),
+            children: _parseNoticeText(afterText),
+          ),
+        ));
+      }
+    }
+
+    // 매직 키워드가 없으면 전체 텍스트를 RichText로
+    if (widgets.isEmpty) {
+      widgets.add(RichText(
+        textAlign: TextAlign.left,
+        text: TextSpan(
+          style: TextStyle(fontSize: 12 * _textScale, color: Colors.grey),
+          children: _parseNoticeText(text),
         ),
-        children: _parseNoticeText(_noticeText!),
+      ));
+    }
+
+    return widgets;
+  }
+
+  /// 토스 QR 이미지 위젯
+  Widget _buildTossQrImage() {
+    return Image.asset(
+      'assets/images/toss_qr.png',
+      width: 150,
+      height: 150,
+    );
+  }
+
+  /// 라이트닝 QR 이미지 위젯
+  Widget _buildLightningQrImage() {
+    return Image.asset(
+      'assets/images/lightning_qr.png',
+      width: 150,
+      height: 150,
+    );
+  }
+
+  /// 비트코인 라이트닝 복사 카드 위젯
+  Widget _buildBtcCopyCard() {
+    return GestureDetector(
+      onTap: () {
+        Clipboard.setData(const ClipboardData(text: _btcLightningAddress));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('주소가 복사되었습니다! 지갑 앱에 붙여넣으세요.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      },
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.bolt, color: Colors.orange, size: 16),
+          SizedBox(width: 4),
+          Text(
+            "라이트닝 네트워크 짤토시 보내주기",
+            style: TextStyle(fontSize: 12, color: Colors.orange, decoration: TextDecoration.underline),
+          ),
+          SizedBox(width: 4),
+          Icon(Icons.copy, color: Colors.orange, size: 14),
+          SizedBox(width: 2),
+          Text(
+            "탭하여 주소복사하기",
+            style: TextStyle(fontSize: 11, color: Colors.orange),
+          ),
+        ],
       ),
     );
   }
@@ -133,9 +275,24 @@ class _MainScreenState extends State<MainScreen> {
           centerTitle: true,
         ),
         body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
+          child: GestureDetector(
+            onScaleStart: (details) {
+              _baseTextScale = _textScale;
+            },
+            onScaleUpdate: (details) {
+              if (details.pointerCount >= 2) {
+                setState(() {
+                  _textScale = (_baseTextScale * details.scale)
+                      .clamp(_minTextScale, _maxTextScale);
+                });
+              }
+            },
+            onScaleEnd: (details) {
+              _saveTextScale();
+            },
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildButton('머리말', () => _nav(DayScreen(title: '머리말', tiArray: Day0.getTiArray()))),
@@ -148,11 +305,27 @@ class _MainScreenState extends State<MainScreen> {
                   children: [
                     Expanded(child: _buildButton('day3-장소', () => _nav(DayScreen(title: 'day3-장소', tiArray: Day3.getTiArray())))),
                     const SizedBox(width: 12),
-                    Expanded(child: _buildButton('궁전만들기Tip', () => _nav(DayScreen(title: '궁전만들기Tip', tiArray: Day32.getTiArray())))),
+                    Expanded(child: _buildButton('Tip-궁전만들기', () => _nav(DayScreen(title: 'Tip-궁전만들기', tiArray: Day32.getTiArray())))),
                   ],
                 ),
                 const SizedBox(height: 12),
-                _buildButton('day4-숫자', () => _nav(DayScreen(title: 'day4-숫자', tiArray: Day4.getTiArray()))),
+                Row(
+                  children: [
+                    Expanded(child: _buildButton('day4-숫자', () => _nav(DayScreen(title: 'day4-숫자', tiArray: Day4.getTiArray())))),
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildButton('Tip2-궁전만들기', () => _nav(DayScreen(title: 'Tip2-궁전만들기', tiArray: Day42.getTiArray())))),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '↓ 기억의궁전 방(공간)을 26개 만들고 진행하세요',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14 * _textScale,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -162,18 +335,17 @@ class _MainScreenState extends State<MainScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  '↓ 첫번째 도전 완료후',
+                _buildButton('day6-PAO', () => _nav(DayScreen(title: 'day6-PAO', tiArray: Day6PAO.getTiArray()))),
+                const SizedBox(height: 12),
+                Text(
+                  '↓ 번외편',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.grey, // 회색 글씨
-                    fontSize: 14,
+                    color: Colors.grey,
+                    fontSize: 14 * _textScale,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 8), // 텍스트와 버튼 사이 간격
-                _buildButton('day6-PAO', () => _nav(DayScreen(title: 'day6-PAO', tiArray: Day6PAO.getTiArray()))),
-                const SizedBox(height: 12),
                 SoundButton(
                   onPressed: () => _nav(DayScreen(title: 'day7-뇌모닉', tiArray: Day7Mnemonic.getTiArray())),
                   child: Row(
@@ -201,6 +373,7 @@ class _MainScreenState extends State<MainScreen> {
               ],
             ),
           ),
+        ),
         ),
       ),
     );

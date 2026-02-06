@@ -1,0 +1,55 @@
+대충 자르는데 빠름
+ffmpeg -i input.mp4 -t 4.5 -c copy output.mp4
+
+정확하게 잘라서 느림(재인코딩필요)
+ffmpeg -i 1.webm -t 4.5 output.webm
+
+ffmpeg -i 1.webm -ss 02:35:12 -to 02:44:00 -c copy output.webm
+
+---------------------------
+
+현재폴더 터미널열어 변경
+for f in ./*.{jpg,JPG,jpeg,JPEG,png,PNG}(N); do
+  [ -f "$f" ] && cwebp -q 80 "$f" -o "${f%.*}.webp" && echo "변환완료: $f"
+done
+
+-------------------------
+내 프로젝트 변경한거(이미 사용)
+
+171개 파일이면 1-2분 정도면 충분합니다. webp 변환은 빠릅니다.                                                                                                   
+                                                                                                                                                                  
+  화질 저하 없는 옵션:                                                                                                                                            
+  # 무손실 (lossless) - 파일 크기는 좀 더 큼                                                                                                                      
+  cwebp -lossless input.png -o output.webp                                                                                                                        
+                                                                                                                                                                  
+  # 또는 품질 100% (거의 무손실)                                                                                                                                  
+  cwebp -q 100 input.png -o output.webp                                                                                                                           
+                                                                                                                                                                  
+  터미널에서 바로 실행하려면:                                                                                                                                     
+                                                                                                                                                                  
+  1. 먼저 cwebp 설치 (한 번만):                                                                                                                                   
+  brew install webp                                                                                                                                               
+                                                                                                                                                                  
+  2. flutter_app 폴더로 이동 후 실행:                                                                                                                             
+  cd /Users/sunguk/0.code/기억의궁전\(github\)/flutter_app                                                                                                        
+                                                                                                                                                                  
+  # 무손실 변환 (모든 png/jpg를 webp로)                                                                                                                           
+  for f in assets/images/*.png assets/images/*.jpg; do                                                                                                            
+    [ -f "$f" ] && cwebp -lossless "$f" -o "${f%.*}.webp" && echo "변환완료: $f"                                                                                  
+  done                                                                                                                                                            
+                                                                                                                                                                  
+  3. 코드에서 확장자 변경:                                                                                                                                        
+  # dart 파일에서 .png → .webp, .jpg → .webp 일괄 변경                                                                                                            
+  LC_ALL=C sed -i '' 's/\.png/.webp/g' lib/data/*.dart lib/screens/*.dart lib/models/*.dart                                                                       
+  LC_ALL=C sed -i '' 's/\.jpg/.webp/g' lib/data/*.dart lib/screens/*.dart lib/models/*.dart                                                                       
+                                                                                                                                                                  
+  4. 원본 파일 삭제 (선택):                                                                                                                                       
+  rm assets/images/*.png assets/images/*.jpg                                                                                                                      
+                                                                                                                                                                  
+  ---                                                                                                                                                             
+  요약: brew로 webp 설치하고, 터미널에서 위 명령어 복붙하면 끝입니다. 제가 대신 실행해드릴 수도 있어요.   
+
+
+-------------
+yt-dlp 로 유튜브 최고화질 다운로드
+yt-dlp -f "bv+ba/b" --merge-output-format mp4 "https://www.youtube.com/watch?v=RiJc-25StXE"

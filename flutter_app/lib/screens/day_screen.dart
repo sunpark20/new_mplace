@@ -1,11 +1,14 @@
 import 'video_screen.dart';
 import 'fullscreen_video_screen.dart';
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
@@ -36,6 +39,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
   DateTime? _lastBackPressTime;
   bool _showExitWarning = false;
   Timer? _exitWarningTimer;
+  bool _isExiting = false;  // 나가기 중복 방지
 
   final List<AudioPlayer> _combatPlayers = [];
   Offset _shakeOffset = Offset.zero;
@@ -68,6 +72,12 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
   Animation<Offset>? _slideAnimation;
   Animation<double>? _scaleAnimation;
   Animation<double>? _rotateAnimation;
+
+  // 텍스트 크기 조절
+  double _textScale = 1.0;
+  double _baseTextScale = 1.0;  // 핀치 시작 시 스케일 저장
+  static const double _minTextScale = 0.8;
+  static const double _maxTextScale = 2.5;
 
   // 선택지 목적지 인덱스들 (이전/다음에서 건너뛸 페이지들)
   late final Set<int> _choiceDestinations;
@@ -262,7 +272,38 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
         }
       }
     }
+    _loadTextScale();
     _loadCurrentPage();
+  }
+
+  Future<void> _loadTextScale() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _textScale = prefs.getDouble('textScale') ?? 1.0;
+    });
+  }
+
+  Future<void> _saveTextScale() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('textScale', _textScale);
+  }
+
+  void _increaseTextScale() {
+    if (_textScale < _maxTextScale) {
+      setState(() {
+        _textScale = (_textScale + 0.1).clamp(_minTextScale, _maxTextScale);
+      });
+      _saveTextScale();
+    }
+  }
+
+  void _decreaseTextScale() {
+    if (_textScale > _minTextScale) {
+      setState(() {
+        _textScale = (_textScale - 0.1).clamp(_minTextScale, _maxTextScale);
+      });
+      _saveTextScale();
+    }
   }
 
   void _loadCurrentPage() {
@@ -892,6 +933,11 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
 
   /// 선택지 버튼 위젯 생성
   Widget _buildChoiceButton(Choice choice) {
+    // 퀘스트 스타일 버튼 (isAccept가 지정된 경우)
+    if (choice.isAccept != null) {
+      return _buildQuestButton(choice);
+    }
+
     return GestureDetector(
       onTapDown: _onChoiceTapDown,
       onTapUp: (_) => _onChoiceTapUp(choice),
@@ -913,23 +959,115 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
     );
   }
 
+  /// 와우 스타일 퀘스트 버튼 생성
+  Widget _buildQuestButton(Choice choice) {
+    final isAccept = choice.isAccept ?? false;
+    final buttonColor = isAccept
+        ? const Color(0xFF2E7D32)  // 진한 녹색
+        : const Color(0xFF8B0000); // 진한 빨강
+    final borderColor = isAccept
+        ? const Color(0xFF4CAF50)  // 밝은 녹색
+        : const Color(0xFFB71C1C); // 밝은 빨강
+
+    return GestureDetector(
+      onTapDown: _onChoiceTapDown,
+      onTapUp: (_) => _onChoiceTapUp(choice),
+      onTapCancel: () => _audioPlayer.stop(),
+      child: AbsorbPointer(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                buttonColor.withValues(alpha: 0.9),
+                buttonColor,
+                buttonColor.withValues(alpha: 0.8),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: borderColor, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.5),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+          child: Text(
+            choice.label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black.withValues(alpha: 0.7),
+                  blurRadius: 2,
+                  offset: const Offset(1, 1),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   /// 선택지 버튼 누름 시작 - mouseclick1 재생
   void _onChoiceTapDown(TapDownDetails details) {
     _audioPlayer.stop();
     _audioPlayer.play(AssetSource('sounds/MouseClick1.wav'));
   }
 
-  /// 선택지 버튼 뗌 - mouseclick2 재생 후 선택 처리
+  /// 선택지 버튼 뗌 - 사운드 재생 후 선택 처리
   void _onChoiceTapUp(Choice choice) async {
     await _audioPlayer.stop();
-    await _audioPlayer.play(AssetSource('sounds/MouseClick2.wav'));
-    // mouseclick2 재생을 위해 잠시 대기
-    await Future.delayed(const Duration(milliseconds: 150));
+
+    // choice에 지정된 사운드가 있으면 그것을 재생, 없으면 기본 클릭 사운드
+    final soundToPlay = choice.soundPath ?? 'sounds/MouseClick2.wav';
+    final isAssetPath = soundToPlay.startsWith('assets/');
+    await _audioPlayer.play(AssetSource(isAssetPath ? soundToPlay.substring(7) : soundToPlay));
+
+    if (choice.soundPath != null) {
+      // 커스텀 사운드는 완료될 때까지 대기
+      final completer = Completer<void>();
+      late StreamSubscription subscription;
+      subscription = _audioPlayer.onPlayerComplete.listen((_) {
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
+        subscription.cancel();
+      });
+      await completer.future;
+    } else {
+      // 기본 클릭 사운드는 짧게 대기
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+
     _handleChoiceSelection(choice);
   }
 
   /// 선택지 선택 처리 - 동영상이 있으면 먼저 재생
   void _handleChoiceSelection(Choice choice) async {
+    // 앱 종료 옵션이 있으면 메시지 표시 후 최소화
+    if (choice.exitApp) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('앱을 종료합니다.'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+      await Future.delayed(const Duration(milliseconds: 1200));
+      SystemNavigator.pop();
+      return;
+    }
+
     if (choice.videoPath != null) {
       // 동영상 재생 후 해당 인덱스로 이동
       await Navigator.push(
@@ -939,8 +1077,11 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
         ),
       );
       _jumpToIndex(choice.targetIndex);
-    } else {
+    } else if (choice.targetIndex >= 0) {
       _jumpToIndex(choice.targetIndex);
+    } else {
+      // targetIndex가 -1이면 다음 페이지로
+      _nextPage();
     }
   }
 
@@ -957,6 +1098,28 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
         _loadCurrentPage();
       });
     }
+  }
+
+  /// 스와이프 시작 시 버튼 누르는 소리
+  void _onSwipeStart() {
+    _audioPlayer.stop();
+    _audioPlayer.play(AssetSource('sounds/MouseClick1.wav'));
+  }
+
+  /// 스와이프로 다음 페이지 (버튼 떼는 소리 후 페이지 이동)
+  Future<void> _swipeNextPage() async {
+    await _audioPlayer.stop();
+    await _audioPlayer.play(AssetSource('sounds/MouseClick2.wav'));
+    await Future.delayed(const Duration(milliseconds: 100));
+    _nextPage();
+  }
+
+  /// 스와이프로 이전 페이지 (버튼 떼는 소리 후 페이지 이동)
+  Future<void> _swipePreviousPage() async {
+    await _audioPlayer.stop();
+    await _audioPlayer.play(AssetSource('sounds/MouseClick2.wav'));
+    await Future.delayed(const Duration(milliseconds: 100));
+    _previousPage();
   }
 
   void _nextPage() {
@@ -1000,7 +1163,10 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
           }
         });
       } else {
-        Navigator.pop(context);
+        if (!_isExiting && mounted && Navigator.canPop(context)) {
+          _isExiting = true;
+          Navigator.pop(context);
+        }
       }
     }
   }
@@ -1128,9 +1294,14 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
 
   /// 네비게이션 버튼 (이전/다음) - 클릭 사운드 포함
   Widget _buildNavButton(String text, VoidCallback? onPressed) {
+    final buttonStyle = ElevatedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    );
+
     if (onPressed == null) {
       return ElevatedButton(
         onPressed: null,
+        style: buttonStyle,
         child: Text(text),
       );
     }
@@ -1150,6 +1321,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
       child: AbsorbPointer(
         child: ElevatedButton(
           onPressed: () {},
+          style: buttonStyle,
           child: Text(text),
         ),
       ),
@@ -1195,16 +1367,35 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
             child: Stack(
               children: [
                 GestureDetector(
-                  // 스와이프 (hasTouchSound/crackTransform이 아닌 페이지에서만)
-                  onHorizontalDragEnd: !ti.hasTouchSound && !ti.hasCrackTransform
-                      ? (details) {
-                          if (details.velocity.pixelsPerSecond.dx > 500 && _currentPage > 0) {
-                            _previousPage();
-                          } else if (details.velocity.pixelsPerSecond.dx < -500) {
-                            if (!ti.hasChoices) _nextPage();
-                          }
-                        }
-                      : null,
+                  behavior: HitTestBehavior.opaque, // 빈 영역에서도 스와이프 감지
+                  // 핀치 줌 + 스와이프
+                  onScaleStart: (details) {
+                    _baseTextScale = _textScale;
+                    if (!ti.hasTouchSound && !ti.hasCrackTransform && details.pointerCount == 1) {
+                      _onSwipeStart();
+                    }
+                  },
+                  onScaleUpdate: (details) {
+                    // 두 손가락 핀치: 글씨 크기 조절
+                    if (details.pointerCount >= 2) {
+                      setState(() {
+                        _textScale = (_baseTextScale * details.scale)
+                            .clamp(_minTextScale, _maxTextScale);
+                      });
+                    }
+                  },
+                  onScaleEnd: (details) {
+                    // 핀치 후 저장
+                    _saveTextScale();
+                    // 단일 손가락 스와이프 처리
+                    if (!ti.hasTouchSound && !ti.hasCrackTransform) {
+                      if (details.velocity.pixelsPerSecond.dx > 200 && _currentPage > 0) {
+                        _swipePreviousPage();
+                      } else if (details.velocity.pixelsPerSecond.dx < -200) {
+                        if (!ti.hasChoices) _swipeNextPage();
+                      }
+                    }
+                  },
                   onTapDown: (details) {
                     if (ti.hasTouchSound) {
                       _handleHighFiveTouch(details.localPosition);
@@ -1214,9 +1405,15 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                   },
                   child: Transform.translate(
                     offset: _shakeOffset,
-                    child: SingleChildScrollView(
-                    padding: EdgeInsets.zero,
-                    child: Column(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          padding: EdgeInsets.zero,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight,
+                            ),
+                            child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         if (ti.hasVideo && _isVideoInitialized)
@@ -1384,27 +1581,6 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                             ],
                           ),
                         ),
-                        if (ti.hasResultImage && _timerCompleted)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
-                            child: Image.asset(
-                              ti.resultImageAssetPath!,
-                              width: double.infinity,
-                              fit: BoxFit.fitWidth,
-                              errorBuilder: (context, error, stackTrace) {
-                                debugPrint(
-                                    'Error loading result image ${ti.resultImageAssetPath}: $error');
-                                return Container(
-                                  height: 200,
-                                  color: Colors.grey[300],
-                                  child: const Center(
-                                    child: Icon(Icons.image_not_supported,
-                                        size: 64),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
                         if (ti.hasAnimation && ti.animationFrames!.isNotEmpty)
                           Stack(
                             children: [
@@ -1525,7 +1701,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                               data: ti.text,
                               style: {
                                 "body": Style(
-                                  fontSize: FontSize(18.0),
+                                  fontSize: FontSize(18.0 * _textScale),
                                   lineHeight: LineHeight(1.6),
                                 ),
                               },
@@ -1551,7 +1727,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                             padding: const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Text(
                               ti.text,
-                              style: const TextStyle(fontSize: 18, height: 1.6),
+                              style: TextStyle(fontSize: 18 * _textScale, height: 1.6),
                             ),
                           ),
 
@@ -1612,8 +1788,11 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                             ),
                           ),
                         const SizedBox(height: 32), // Add bottom padding for better scrolling
-                      ],
-                    ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                 ),),
                 if (_showExitWarning)
@@ -1701,24 +1880,8 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
           ),
           SafeArea(
             top: false,
-            bottom: false,
-            child: Container(
-              padding: const EdgeInsets.only(
-                left: 16.0,
-                right: 16.0,
-                top: 16.0,
-                bottom: 32.0,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, -2),
-                  ),
-                ],
-              ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1731,13 +1894,18 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.home),
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          if (!_isExiting && mounted && Navigator.canPop(context)) {
+                            _isExiting = true;
+                            Navigator.pop(context);
+                          }
+                        },
                         tooltip: '홈으로',
                       ),
                       const SizedBox(width: 8),
                       Text(
                         '${_currentPage + 1} / ${widget.tiArray.length}',
-                        style: const TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 14),
                       ),
                     ],
                   ),

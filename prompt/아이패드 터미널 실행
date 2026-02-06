@@ -1,0 +1,10 @@
+# 1. 시뮬레이터 부팅                                                                                                                         
+  open -a Simulator                                                                                                                            
+  xcrun simctl boot "iPad Air 13-inch (M3)"    
+                                                                                                                                               
+  # 2. Flutter 앱 실행                                                                                                                         
+  cd /Users/sunguk/0.code/기억의궁전\(github\)/flutter_app                                                                                     
+  flutter run -d "iPad Air 13-inch (M3)"                                                                                                       
+                                                                                                                                               
+  또는 ID로 직접 실행:                                                                                                                         
+  flutter run -d 4CB60F4A-8D79-4464-8485-85284F1B9713 

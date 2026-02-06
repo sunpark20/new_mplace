@@ -89,7 +89,7 @@ class Day1 {
       ),
       TI( //인덱스16
         text: "하이파이브 한 번 하고 다음으로 갑시다.",
-        imageAssetPath: 'assets/images/d2_16.webp',
+        imageAssetPath: 'assets/images/palm.webp',
       ).withTouchSound().withCrackTransform(
         cracks: ['assets/images/crack1.webp', 'assets/images/crack2.webp'],
         thresholds: [33, 66],

@@ -4,14 +4,20 @@ const String arrow_h = "<br>   ▽<br>";
 
 /// 선택지 클래스 - 분기 처리에 사용
 /// [label]: 버튼에 표시될 텍스트
-/// [targetIndex]: 선택 시 이동할 TI 배열의 인덱스
+/// [targetIndex]: 선택 시 이동할 TI 배열의 인덱스 (-1이면 이동 없음)
 /// [videoPath]: 선택 시 재생할 동영상 경로 (옵션, 가로모드 풀스크린 재생)
+/// [soundPath]: 선택 시 재생할 사운드 경로
+/// [exitApp]: true면 사운드 재생 후 앱 종료
+/// [isAccept]: 퀘스트 스타일 - true면 수락(녹색), false면 거절(빨강)
 class Choice {
   final String label;
   final int targetIndex;
   final String? videoPath;
+  final String? soundPath;
+  final bool exitApp;
+  final bool? isAccept;
 
-  Choice(this.label, this.targetIndex, {this.videoPath});
+  Choice(this.label, this.targetIndex, {this.videoPath, this.soundPath, this.exitApp = false, this.isAccept});
 }
 
 /// 전환 효과 종류
@@ -38,7 +44,6 @@ class TI {
   final bool hasFullscreenVideoButton;
   final String? fullscreenVideoPath;
   final bool isTouchPage;
-  final String? resultImageAssetPath;
   final bool hasTouchSound;
   final String? overlayText;
   final List<Choice>? choices;
@@ -75,7 +80,6 @@ class TI {
     this.hasFullscreenVideoButton = false,
     this.fullscreenVideoPath,
     this.isTouchPage = false,
-    this.resultImageAssetPath,
     this.hasTouchSound = false,
     this.overlayText,
     this.choices,
@@ -111,7 +115,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
@@ -139,7 +142,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
@@ -167,7 +169,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: true,
       overlayText: overlayText,
       choices: choices,
@@ -198,7 +199,6 @@ class TI {
       hasFullscreenVideoButton: true,
       fullscreenVideoPath: videoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
@@ -226,7 +226,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
@@ -254,7 +253,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
@@ -282,35 +280,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: true,
-      resultImageAssetPath: resultImageAssetPath,
-      hasTouchSound: hasTouchSound,
-      overlayText: overlayText,
-      choices: choices,
-      initialSound: initialSound,
-      repeatCount: repeatCount,
-      showCounter: showCounter,
-      videoPath: videoPath,
-      crackImages: crackImages,
-      crackThresholds: crackThresholds,
-      transformThreshold: transformThreshold,
-      transformedImage: transformedImage,
-      transformSound: transformSound,
-      transformEffect: transformEffect,
-    );
-  }
-
-  TI withResultImage(String image) {
-    return TI(
-      text: text,
-      imageAssetPath: imageAssetPath,
-      animationFrames: animationFrames,
-      soundAssetPath: soundAssetPath,
-      alarmTimeInSeconds: alarmTimeInSeconds,
-      isHtml: isHtml,
-      hasFullscreenVideoButton: hasFullscreenVideoButton,
-      fullscreenVideoPath: fullscreenVideoPath,
-      isTouchPage: isTouchPage,
-      resultImageAssetPath: image,
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
@@ -331,7 +300,6 @@ class TI {
   bool get hasAnimation => animationFrames != null && animationFrames!.isNotEmpty;
   bool get hasSound => soundAssetPath != null;
   bool get hasImage => imageAssetPath != null;
-  bool get hasResultImage => resultImageAssetPath != null;
   bool get hasChoices => choices != null && choices!.isNotEmpty;
   bool get hasVideo => videoPath != null;
   bool get hasCrackTransform => crackImages != null && crackThresholds != null && transformThreshold != null && transformedImage != null;
@@ -349,7 +317,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
       overlayText: text,
       choices: choices,
@@ -379,7 +346,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
@@ -423,7 +389,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
@@ -457,7 +422,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
@@ -504,7 +468,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: true,
       overlayText: overlayText,
       choices: choices,
@@ -536,7 +499,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
@@ -568,7 +530,6 @@ class TI {
       hasFullscreenVideoButton: hasFullscreenVideoButton,
       fullscreenVideoPath: fullscreenVideoPath,
       isTouchPage: isTouchPage,
-      resultImageAssetPath: resultImageAssetPath,
       hasTouchSound: hasTouchSound,
       overlayText: overlayText,
       choices: choices,
