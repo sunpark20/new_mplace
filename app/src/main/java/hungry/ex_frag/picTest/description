@@ -1,7 +1,0 @@
-pic_Activity
-youtube 버튼은 이름만 놔두고 다음 2가지 역할을 위해서 사용한다.
-static boolean test=false; 변수를 이용해서 youtube 버튼의 동작을 두가지로 구분한다.
-
-youtube를 터치했을 때,
-test가 false일 경우 - 에니메이션이 시작된다.
-test가 true일 경우 - 정답맞추기 엑티비티로 intent 한다.
