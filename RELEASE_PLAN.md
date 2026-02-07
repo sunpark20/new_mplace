@@ -7,11 +7,16 @@ Flutter 기반 기억력 트레이닝 앱 "기억의 궁전"의 iOS App Store �
 
 ## 진행 상황
 - [x] Phase 0: 크리티컬 버그 수정 ✅
-- [ ] Phase 1: iOS App Store 필수 요구사항 (1-2 완료, 1-1/1-3/1-4/1-5 사용자 작업 필요)
+- [x] Phase 1-1: 앱 아이콘 생성 ✅ (main.webp 기반)
+- [x] Phase 1-2: Info.plist 수정 ✅ (앱 이름 한글화, ATS 보안)
+- [ ] Phase 1-3: Bundle ID 확인 (사용자 확인 필요: `com.sunguk.mplace`)
+- [ ] Phase 1-4: 버전 번호 결정 (현재 `1.0.0+1`)
+- [x] Phase 1-5: 개인정보 처리방침 ✅ (docs/privacy-policy.html)
 - [x] Phase 2: 앱 크기 최적화 ✅ (491MB → 190MB, -61%)
 - [x] Phase 3: 릴리즈 빌드 안정성 ✅
 - [x] Phase 4: Deprecated API 정리 ✅
-- [ ] Phase 5: iOS 플랫폼 동작 확인
+- [x] Phase 5-1: iOS 무음모드 오디오 설정 ✅
+- [ ] Phase 5-2/3: 실기기 테스트 (사용자 테스트 필요)
 - [ ] Phase 6: App Store 제출
 
 ---
