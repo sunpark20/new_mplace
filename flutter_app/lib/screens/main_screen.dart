@@ -329,7 +329,7 @@ class _MainScreenState extends State<MainScreen> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Expanded(child: _buildButton('day5-카드, () => _nav(DayScreen(title: 'day5-카드', tiArray: Day5FC.getTiArray())))),
+                    Expanded(child: _buildButton('day5-카드', () => _nav(DayScreen(title: 'day5-카드', tiArray: Day5FC.getTiArray())))),
                     const SizedBox(width: 12),
                     Expanded(child: _buildButton('인물-숫자 샘플', () => _nav(const NumSampleScreen()))),
                   ],
