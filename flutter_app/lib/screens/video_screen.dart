@@ -204,7 +204,7 @@ class _ControlsOverlayState extends State<_ControlsOverlay> {
         children: [
           if (_isVisible)
             Container(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               child: Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -214,7 +214,7 @@ class _ControlsOverlayState extends State<_ControlsOverlay> {
                       onPressed: () => _seekRelative(-10),
                       iconSize: 48,
                       icon: const Icon(Icons.replay_10),
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                     ),
                     // Play/Pause
                     IconButton(
@@ -239,7 +239,7 @@ class _ControlsOverlayState extends State<_ControlsOverlay> {
                       onPressed: () => _seekRelative(10),
                       iconSize: 48,
                       icon: const Icon(Icons.forward_10),
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ],
                 ),

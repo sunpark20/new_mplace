@@ -56,8 +56,6 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
   bool _isRepeatPlaying = false;
   CancelableOperation<void>? _repeatSoundOperation;
   StreamSubscription<void>? _repeatCompleteSubscription;
-  String? _currentRepeatPath;
-
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
   bool _autoVideoPlayed = false;  // autoFullscreenVideo 재생 완료 여부
@@ -288,24 +286,6 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
     await prefs.setDouble('textScale', _textScale);
   }
 
-  void _increaseTextScale() {
-    if (_textScale < _maxTextScale) {
-      setState(() {
-        _textScale = (_textScale + 0.1).clamp(_minTextScale, _maxTextScale);
-      });
-      _saveTextScale();
-    }
-  }
-
-  void _decreaseTextScale() {
-    if (_textScale > _minTextScale) {
-      setState(() {
-        _textScale = (_textScale - 0.1).clamp(_minTextScale, _maxTextScale);
-      });
-      _saveTextScale();
-    }
-  }
-
   void _loadCurrentPage() {
     _timerCompleted = false;
     _currentAnimationFrame = 0;
@@ -316,7 +296,6 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
     _repeatSoundOperation = null;
     _repeatCompleteSubscription?.cancel();
     _repeatCompleteSubscription = null;
-    _currentRepeatPath = null;
     _repeatAudioPlayer.stop();
     _disposeVideoController();
     _autoVideoPlayed = false;
@@ -651,8 +630,6 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
 
   void _playRepeatSound(String repeatPath) async {
     if (_currentRepeatCount >= _totalRepeatCount) return;
-
-    _currentRepeatPath = repeatPath;
 
     // 기존 subscription 정리
     _repeatCompleteSubscription?.cancel();
@@ -1436,7 +1413,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.5),
+                                        color: Colors.black.withValues(alpha: 0.5),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Text(
@@ -1521,7 +1498,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
+                                    color: Colors.black.withValues(alpha: 0.5),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
@@ -1542,7 +1519,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
+                                    color: Colors.black.withValues(alpha: 0.5),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
@@ -1562,11 +1539,11 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                                   decoration: BoxDecoration(
-                                    color: Colors.orange.withOpacity(0.9),
+                                    color: Colors.orange.withValues(alpha: 0.9),
                                     borderRadius: BorderRadius.circular(30),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.3),
+                                        color: Colors.black.withValues(alpha: 0.3),
                                         blurRadius: 8,
                                         spreadRadius: 2,
                                       ),
@@ -1635,7 +1612,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
+                                    color: Colors.black.withValues(alpha: 0.5),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
@@ -1656,7 +1633,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
+                                    color: Colors.black.withValues(alpha: 0.5),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
@@ -1676,11 +1653,11 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                                   decoration: BoxDecoration(
-                                    color: Colors.orange.withOpacity(0.9),
+                                    color: Colors.orange.withValues(alpha: 0.9),
                                     borderRadius: BorderRadius.circular(30),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.3),
+                                        color: Colors.black.withValues(alpha: 0.3),
                                         blurRadius: 8,
                                         spreadRadius: 2,
                                       ),
@@ -1861,10 +1838,10 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                   height: 40,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.white.withOpacity(opacity),
+                                    color: Colors.white.withValues(alpha: opacity),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.yellow.withOpacity(opacity * 0.8),
+                                        color: Colors.yellow.withValues(alpha: opacity * 0.8),
                                         blurRadius: 15,
                                         spreadRadius: 10,
                                       ),
