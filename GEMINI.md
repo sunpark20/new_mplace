@@ -75,20 +75,18 @@
 ## 5. Recent Changes
 
 *   **Migration**: Porting logic from Android (Java) to Flutter is **COMPLETE**.
-
-*   **Verification**:
-
-    *   `flutter analyze`: **PASSED** (0 issues).
-
-    *   `flutter test`: **PASSED**.
-
-    *   Code style fixes (String interpolation) applied.
-
-    *   Dependencies resolved (`flutter_lints` downgraded to ^5.0.0).
-
-*   **Structure**: Mirroring `TI` structure in Dart.
-
-*   **Video**: Switched from External Intent (Java) to In-App `VideoPlayer` (Flutter).
+*   **iOS Release Prep (2026-02-08)**: See `RELEASE_PLAN.md` for full details.
+    *   Bug fixes: duplicate initState, unused imports, splash config
+    *   App icons generated from main.webp via flutter_launcher_icons
+    *   Info.plist: Korean display name, ATS security hardened
+    *   Assets optimized: 491MB → 190MB (-61%)
+    *   Global error handler (runZonedGuarded) in main.dart
+    *   31 debugPrints wrapped in kDebugMode
+    *   14 deprecated withOpacity → withValues(alpha:)
+    *   flutter_html pinned to exact version
+    *   iOS AVAudioSession playback mode for silent switch
+    *   Privacy policy created at docs/privacy-policy.html
+*   **Remaining**: Bundle ID confirmation, version number, device testing, App Store submission
 
 ## 6. Troubleshooting / iOS
 From experience, debugging on physical iOS devices in this environment requires specific handling:
