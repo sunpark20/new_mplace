@@ -1387,11 +1387,15 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                   onScaleEnd: (details) {
                     // 핀치 후 저장
                     _saveTextScale();
-                    // 단일 손가락 스와이프 처리
+                    // 단일 손가락 스와이프 처리 (위/아래 스와이프는 무시)
                     if (!ti.hasTouchSound && !ti.hasCrackTransform) {
-                      if (details.velocity.pixelsPerSecond.dx > 200 && _currentPage > 0) {
+                      final dx = details.velocity.pixelsPerSecond.dx;
+                      final dy = details.velocity.pixelsPerSecond.dy;
+                      // 수직 속도가 수평 속도보다 크면 위/아래 스와이프로 간주하여 무시
+                      if (dy.abs() > dx.abs()) return;
+                      if (dx > 200 && _currentPage > 0) {
                         _swipePreviousPage();
-                      } else if (details.velocity.pixelsPerSecond.dx < -200) {
+                      } else if (dx < -200) {
                         if (!ti.hasChoices) _swipeNextPage();
                       }
                     }

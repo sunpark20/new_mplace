@@ -5,71 +5,14 @@ class Day5FC {
 
   static List<TI> getTiArray() {
     return [
-      TI( //인덱스1
-        text: "먼저 자주하는 질문들에 답변해드릴게요."+
-        "",
-        imageAssetPath: 'assets/images/d5_1.webp',
-      ),
-      TI( //인덱스2
-        text: "A)하루에 20~30분 정도 꾸준히 연습하세요. 일단은 장소부터 확실하게 확보해야 합니다.\n저도 기억의 궁전을 만들기 위해서"
-            " 사진을 찍으며 동내를 걸어다니고, 옛날 살던 곳을 찾아간 적도 있습니다."
-            " 또 여행을 다녀오면 꼭 그곳을 이용해서 기억의 궁전을 만들고 이상한 것들을 외운답니다."
-            "$arrow기억의궁전을 위해 많이 돌아다니고, 새로운걸 시도해본다. -> 삶의 경험이 풍부해진다. 선순환이 만들어집니다.",
-        imageAssetPath: 'assets/images/d5_2.webp',
-      ),
-      TI( //인덱스3
-        text: "제가 쓰는 팁을 몇개 더 알려드릴께요.\n"
-            "'day2-상상하기' 에서 나왔던 체인입니다.\n"
-            "1번 방에 이미지를 결합 -> 2번 방까지 이미지를 결합합니다. 뒤돌아서 1번방 확인하고 3번으로 진행."+
-            " 뒤를 돌아보며, 이전 방을 한번 더 확인하면 시간 소모되지만, 단기기억에 도움이 됩니다."+
-            " 마지막 이미지까지 결합했다면, 끝에서 처음 역순으로 한번 더 방을 확인합니다."
-            "\n   ▽\n처음부터 끝까지 뒤돌아보며 진행"
-            "\n   ▽\n끝에서 처음까지 다시 한번 걸어간다"
-            "\n   ▽\n이게 저의 한 세트입니다.",
-        imageAssetPath: 'assets/images/chain.webp',
-      ),
-      TI( //인덱스4
-        text: "에빙하우스의 <a href='https://ko.wikipedia.org/wiki/%EB%A7%9D%EA%B0%81_%EA%B3%A1%EC%84%A0'>망각곡선</a>입니다. \n\n"
-            "사람마다 효과적인 복습주기는 다릅니다. 자신에게 맞는 복습주기를 찾는다면 학습에 도움이 될 것입니다. "
-            "저같은 경우엔 학습 직후, 24시간, 1주, 1달, 3달후 주기로 복습합니다. \n"
-            "자신에게 맞는 방법을 찾아보세요. 어떤 조건에서 더 기억이 잘 나는지, 어떤 주기로 외우면 좋을지 알 수 있습니다.",
-        imageAssetPath: 'assets/images/d5_3.webp',
-      ).asHtml(),
-      TI( //인덱스5
-        text: "두번째 질문이네요. 방을 쪼개는 방법이 있습니다. 다음 그림을 보며 이야기 합시다.",
-        imageAssetPath: 'assets/images/d5_4.webp',
-      ),
-      TI( //인덱스6
-        text: "방에 들어갔을 때, 정면에 보이는 것은 베란다 창문입니다. 이 곳을 기준으로 시계 방향으로 돕니다. 텔레비전, 책상, 침대를 거쳐 다시 베란다 창문으로 오게 되면"
-            " 방을 빠져 나갑니다. 이미지를 저장할 수 있는 공간이 4개로 늘어났죠. 방향마다 특색이 있는 공간이라면 빙 둘러보며 많은 장소를 확보할 수 있습니다.",
-        imageAssetPath: 'assets/images/d5_5.webp',
-      ),
-      TI( //인덱스7
-        text: "긴 궁전을 만드는 두번째 팁입니다. 머리속에선 뭐든지 가능합니다. 마지막 장소에 빛의 기둥을 만드세요. 그리고 그 옆엔 단서를 놔둡니다.\n"
-            "예)집 뒷산 정상까지 올라갔다. 그곳에 빛의 기둥을 세우고 내가 좋아하는 도미를 놔뒀다. 빛의 기둥에 다가가니 슈우우우웅~ 도미를 파는 해운대 회센터로 왔다. 여기부터 방을 만들며 이어 간다.",
-        imageAssetPath: 'assets/images/d5_6.webp',
-      ).withSound('assets/sounds/shsh.mp3'),
-      TI( //인덱스8
-        text: "꾸준히 기억의 궁전을 하시다 보면 자신만의 비법이 생길거에요. \"이렇게 하니까 잘 안외워지네. 아 이런건 잘 외워지네~\"\n"
-            "제가 가르쳐주는 팁들이 잘 맞으면 참고하시고 아니라면 버리면 됩니다.",
-        imageAssetPath: 'assets/images/palm.webp',
-      ).withTouchSound().withCrackTransform(
-        cracks: ['assets/images/crack1.webp', 'assets/images/crack2.webp'],
-        thresholds: [33, 66],
-        transformAt: 99,
-        transformTo: 'assets/images/citadel.webp',
-        sound: 'assets/sounds/ClanInvitation.wav',
-        effect: TransformEffect.fadeIn,
-        popupTitle: '히든조건 달성',
-        popupButtonText: '시타델 가입링크',
-        popupLink: 'https://discord.com/invite/gfWYEFkDPd',
-      ),
-      TI( //인덱스9
-        text: "0~99까지 숫자를 자음화->인물로 변환(day4)해서 기억의 궁전으로 외우시면 됩니다."
-            "(0~9, 00~99)\n"
-            "다음장으로 가서 자세한 설명을 봅시다.",
-        imageAssetPath: 'assets/images/d5_8.webp',
-      ),
+      //영화21 포스터 소개: 카드 카운팅
+      //수학자 에드워드 소프 소개: 블랙잭/ 룰렛을 정복하고 세상에서 가장 큰 카지노인 주식시장을 정복한 사람
+      //
+
+      
+      //카드를 외우는 방법
+
+      //"죠슈아 포어 기술 <a href='https://archive.nytimes.com/www.nytimes.com/interactive/2011/02/20/magazine/mind-secrets.html?_r=0'>죠수아포어의팁</a> 기사입니다.(영어)"
       TI( //인덱스10
         text: "대한민국의 자랑스러운 마라토너 이봉주씨입니다. 이봉주씨는 숫자 (ㅇ)8 (ㅂ)6이 되겠죠. 중요한 점은 행동이나 특징을 같이 외워야 합니다."
             " 마라톤을 하는 행동. 선글라스와 스포츠 목걸이. 신체적 특징인 쌍거풀 수술한 눈. 등의 행동이나 특징을 함께 외울 수 있습니다."
@@ -83,7 +26,7 @@ class Day5FC {
             "<span style='color: red; font-size: 23px;'>100개의 기억의궁전을 확보하고, 0~99 숫자를 자신만의 캐릭터로 외우세요. 이 100개의 방은 숫자외우기의 탄탄한 기초가 될것입니다.</span> ",
         imageAssetPath: 'assets/images/d5_8.webp',
       ).asHtml(),
-      //"마지막으로 <a href='https://archive.nytimes.com/www.nytimes.com/interactive/2011/02/20/magazine/mind-secrets.html?_r=0'>죠수아포어의팁</a> 기사입니다.(영어)"
+      
     ];
   }
 }
