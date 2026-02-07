@@ -3,6 +3,7 @@ import 'fullscreen_video_screen.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:async/async.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -376,7 +377,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
       width: double.infinity,
       fit: BoxFit.fitWidth,
       errorBuilder: (context, error, stackTrace) {
-        debugPrint('Error loading transformed image ${ti.transformedImage}: $error');
+        if (kDebugMode) debugPrint('Error loading transformed image ${ti.transformedImage}: $error');
         return Container(
           height: 200,
           color: Colors.grey[300],
@@ -530,7 +531,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
         await _videoController!.play();
       }
     } catch (e) {
-      debugPrint('Error initializing video: $e');
+      if (kDebugMode) debugPrint('Error initializing video: $e');
       _disposeVideoControllerAsync();
     }
   }
@@ -541,7 +542,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
         await _videoController!.pause();
         await _videoController!.dispose();
       } catch (e) {
-        debugPrint('Error disposing video controller: $e');
+        if (kDebugMode) debugPrint('Error disposing video controller: $e');
       }
       _videoController = null;
       _isVideoInitialized = false;
@@ -557,7 +558,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
       controller!.pause().then((_) {
         controller.dispose();
       }).catchError((e) {
-        debugPrint('Error disposing video controller sync: $e');
+        if (kDebugMode) debugPrint('Error disposing video controller sync: $e');
         try {
           controller.dispose();
         } catch (_) {}
@@ -567,9 +568,9 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
 
   /// 페이지 로드 시 자동으로 풀스크린 비디오 재생
   void _playAutoFullscreenVideo(String videoPath) async {
-    debugPrint('=== _playAutoFullscreenVideo started ===');
+    if (kDebugMode) debugPrint('=== _playAutoFullscreenVideo started ===');
     if (mounted) {
-      debugPrint('=== Navigator.push starting ===');
+      if (kDebugMode) debugPrint('=== Navigator.push starting ===');
       await Navigator.push(
         context,
         PageRouteBuilder(
@@ -579,10 +580,10 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
           reverseTransitionDuration: Duration.zero,
         ),
       );
-      debugPrint('=== Navigator.push returned, mounted=$mounted ===');
+      if (kDebugMode) debugPrint('=== Navigator.push returned, mounted=$mounted ===');
       // 비디오 완료 후 돌아오면 콘텐츠 표시
       if (mounted) {
-        debugPrint('=== Setting _autoVideoPlayed = true ===');
+        if (kDebugMode) debugPrint('=== Setting _autoVideoPlayed = true ===');
         setState(() {
           _autoVideoPlayed = true;
         });
@@ -607,7 +608,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
         await _audioPlayer.play(AssetSource(cleanPath));
       }
     } catch (e) {
-      debugPrint('Error playing sound: $e');
+      if (kDebugMode) debugPrint('Error playing sound: $e');
     }
   }
 
@@ -618,7 +619,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
       await _backgroundMusicPlayer.setReleaseMode(ReleaseMode.loop);
       await _backgroundMusicPlayer.play(AssetSource(cleanPath));
     } catch (e) {
-      debugPrint('Error playing background music: $e');
+      if (kDebugMode) debugPrint('Error playing background music: $e');
     }
   }
 
@@ -635,7 +636,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
       // 초기 사운드가 끝나면 반복 사운드 시작 (취소 가능하도록)
       _repeatSoundOperation = CancelableOperation.fromFuture(
         _audioPlayer.onPlayerComplete.first,
-        onCancel: () => debugPrint('Repeat sound operation cancelled'),
+        onCancel: () { if (kDebugMode) debugPrint('Repeat sound operation cancelled'); },
       );
 
       _repeatSoundOperation!.value.then((_) {
@@ -644,7 +645,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
         }
       });
     } catch (e) {
-      debugPrint('Error playing initial sound: $e');
+      if (kDebugMode) debugPrint('Error playing initial sound: $e');
     }
   }
 
@@ -689,7 +690,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
       await _repeatAudioPlayer.stop();
       await _repeatAudioPlayer.play(AssetSource(cleanRepeatPath));
     } catch (e) {
-      debugPrint('Error playing repeat sound: $e');
+      if (kDebugMode) debugPrint('Error playing repeat sound: $e');
     }
   }
 
@@ -1258,7 +1259,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
 
     final soundIndex = _random.nextInt(_combatSounds.length);
     final sound = _combatSounds[soundIndex];
-    debugPrint('Playing sound $soundIndex: $sound (total: ${_combatSounds.length})');
+    if (kDebugMode) debugPrint('Playing sound $soundIndex: $sound (total: ${_combatSounds.length})');
     final player = AudioPlayer();
     _combatPlayers.add(player);
 
@@ -1269,7 +1270,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
         _combatPlayers.remove(player);
       });
     } catch (e) {
-      debugPrint('Error playing combat sound: $e');
+      if (kDebugMode) debugPrint('Error playing combat sound: $e');
       player.dispose();
       _combatPlayers.remove(player);
     }
@@ -1466,7 +1467,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                               width: double.infinity,
                               fit: BoxFit.fitWidth,
                               errorBuilder: (context, error, stackTrace) {
-                                debugPrint(
+                                if (kDebugMode) debugPrint(
                                     'Error loading image ${ti.imageAssetPath}: $error');
                                 return Container(
                                   height: 200,
@@ -1593,7 +1594,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                               fit: BoxFit.fitWidth,
                               gaplessPlayback: true,
                               errorBuilder: (context, error, stackTrace) {
-                                debugPrint(
+                                if (kDebugMode) debugPrint(
                                     'Error loading animation frame: $error');
                                 return Container(
                                   height: 200,
@@ -1709,17 +1710,17 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                 ),
                               },
                               onLinkTap: (url, attributes, element) async {
-                                debugPrint('Link tapped: $url');
+                                if (kDebugMode) debugPrint('Link tapped: $url');
                                 if (url != null) {
                                   final uri = Uri.parse(url);
                                   try {
                                     if (await canLaunchUrl(uri)) {
                                       await launchUrl(uri, mode: LaunchMode.externalApplication);
                                     } else {
-                                      debugPrint('Could not launch $url');
+                                      if (kDebugMode) debugPrint('Could not launch $url');
                                     }
                                   } catch (e) {
-                                    debugPrint('Error launching url: $e');
+                                    if (kDebugMode) debugPrint('Error launching url: $e');
                                   }
                                 }
                               },
@@ -1775,7 +1776,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
                                     ),
                                   );
                                 } catch (e) {
-                                  debugPrint('Error navigating to video: $e');
+                                  if (kDebugMode) debugPrint('Error navigating to video: $e');
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text('비디오를 재생할 수 없습니다'),

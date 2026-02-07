@@ -1,16 +1,31 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'screens/loading_screen.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+  runZonedGuarded(() {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+    FlutterError.onError = (details) {
+      if (kDebugMode) {
+        FlutterError.presentError(details);
+      }
+    };
 
-  runApp(const MemoryPalaceApp());
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    runApp(const MemoryPalaceApp());
+  }, (error, stack) {
+    if (kDebugMode) {
+      debugPrint('Uncaught error: $error');
+      debugPrint('Stack: $stack');
+    }
+  });
 }
 
 class MemoryPalaceApp extends StatelessWidget {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -61,7 +62,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _fetchNotice() async {
     try {
-      final response = await http.get(Uri.parse(_noticeUrl));
+      final response = await http.get(Uri.parse(_noticeUrl)).timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
         final text = response.body.trim();
         setState(() {
@@ -246,7 +247,7 @@ class _MainScreenState extends State<MainScreen> {
             try {
               await launchUrl(uri, mode: LaunchMode.externalApplication);
             } catch (e) {
-              debugPrint('Error launching URL: $e');
+              if (kDebugMode) debugPrint('Error launching URL: $e');
             }
           },
       ));

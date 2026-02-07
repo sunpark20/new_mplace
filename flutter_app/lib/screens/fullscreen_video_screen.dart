@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
@@ -47,7 +48,7 @@ class _FullscreenVideoScreenState extends State<FullscreenVideoScreen> {
         await _controller!.play();
       }
     } catch (e) {
-      debugPrint('Error initializing video: $e');
+      if (kDebugMode) debugPrint('Error initializing video: $e');
       if (mounted) {
         setState(() {
           _hasError = true;
@@ -74,9 +75,9 @@ class _FullscreenVideoScreenState extends State<FullscreenVideoScreen> {
   }
 
   Future<void> _closeWithTransition() async {
-    debugPrint('=== _closeWithTransition started ===');
+    if (kDebugMode) debugPrint('=== _closeWithTransition started ===');
     if (!mounted) {
-      debugPrint('=== NOT MOUNTED, returning ===');
+      if (kDebugMode) debugPrint('=== NOT MOUNTED, returning ===');
       return;
     }
 
@@ -94,15 +95,15 @@ class _FullscreenVideoScreenState extends State<FullscreenVideoScreen> {
       await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
       await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     } catch (e) {
-      debugPrint('Orientation change failed: $e');
+      if (kDebugMode) debugPrint('Orientation change failed: $e');
     }
 
     // 5. 회전 완료 대기 후 pop
     await Future.delayed(const Duration(milliseconds: 100));
 
-    debugPrint('=== Calling Navigator.pop, mounted=$mounted ===');
+    if (kDebugMode) debugPrint('=== Calling Navigator.pop, mounted=$mounted ===');
     if (mounted) Navigator.pop(context);
-    debugPrint('=== Navigator.pop done ===');
+    if (kDebugMode) debugPrint('=== Navigator.pop done ===');
   }
 
   @override
@@ -113,7 +114,7 @@ class _FullscreenVideoScreenState extends State<FullscreenVideoScreen> {
         SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
       } catch (e) {
-        debugPrint('Orientation change failed: $e');
+        if (kDebugMode) debugPrint('Orientation change failed: $e');
       }
     }
     _controller?.removeListener(_onVideoProgress);

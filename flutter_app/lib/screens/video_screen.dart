@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -46,7 +47,7 @@ class _VideoScreenState extends State<VideoScreen> {
         await _controller!.play();
       }
     } catch (e) {
-      debugPrint('Error initializing video: $e');
+      if (kDebugMode) debugPrint('Error initializing video: $e');
       if (mounted) {
         setState(() {
           _hasError = true;
@@ -64,7 +65,7 @@ class _VideoScreenState extends State<VideoScreen> {
         DeviceOrientation.portraitUp,
       ]);
     } catch (e) {
-      debugPrint('Orientation change failed: $e');
+      if (kDebugMode) debugPrint('Orientation change failed: $e');
     }
     _controller?.dispose();
     super.dispose();
