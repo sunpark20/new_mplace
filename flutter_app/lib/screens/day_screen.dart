@@ -1,7 +1,6 @@
 import 'video_screen.dart';
 import 'fullscreen_video_screen.dart';
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';

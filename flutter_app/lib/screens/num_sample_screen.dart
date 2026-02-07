@@ -19,7 +19,6 @@ class _NumSampleScreenState extends State<NumSampleScreen> {
   @override
   void initState() {
     super.initState();
-    super.initState();
     _loadData();
   }
 
