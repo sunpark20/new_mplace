@@ -11,5 +11,8 @@ void main() {
 
     // Verify that loading screen appears
     expect(find.text('기억의 궁전'), findsOneWidget);
+
+    // Pump and settle to complete all animations and timers
+    await tester.pumpAndSettle(const Duration(seconds: 3));
   });
 }
